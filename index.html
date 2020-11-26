@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+uniform mat4 mModel;
+uniform mat4 mView;
+uniform mat4 mProjection;
+varying vec4 fNormal;
+void main(){
+    gl_Position = mProjection * mView * mModel * vPosition;
+    fNormal = vNormal;
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+varying vec4 fNormal;
+void main() {
+    //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    gl_FragColor = abs(fNormal);
+}
+</script>
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="../Common/cube.js"></script>
+<script type="text/javascript" src="../Common/sphere.js"></script>
+<script type="text/javascript" src="../Common/cylinder.js"></script>
+<script type="text/javascript" src="../Common/torus.js"></script>
+<script type="text/javascript" src="../Common/pyramid.js"></script>
+<script type="text/javascript" src="../Common/paraboloid.js"></script>
+<script type="text/javascript" src="app.js"></script>
+</head>
+<body>
+    <div>
+    <title>Primitive Instanciation</title>
+    <canvas id="gl-canvas" width="800" height="800">
+        Oops... your browser doesn't support the HTML5 canvas element"
+    </canvas>
+
+    <div>
+        <label>l: </label><input id="l-factor" type="range" step=".1" min="0" max="1"></input>
+        <br>
+        <label>α: </label><input id="alpha" type="range" step=".1" min="0" max="360"></input>
+    </div>
+
+    <div>
+        tx: <input id="tx" type="range" name="tx" min="-1.0" max="1.0" step="0.05"></input>
+        ty: <input id="ty" type="range" name="ty" min="-1.0" max="1.0" step="0.05"></input>
+        tz: <input id="tz" type="range" name="tz" min="-1.0" max="1.0" step="0.05"></input>
+    </div>
+    <div>
+        rx: <input id="rx" type="range" name="rx" min="-180" max="180.0" step="1"></input>
+        ry: <input id="ry" type="range" name="ry" min="-180" max="180.0" step="1"></input>
+        rz: <input id="rz" type="range" name="rz" min="-180" max="180.0" step="1"></input>
+    </div>
+    <div>
+        sx: <input id="sx" type="range" name="sx" min="0.05" max="2.0" value="1.0" step="0.05"></input>
+        sy: <input id="sy" type="range" name="sy" min="0.05" max="2.0" value="1.0" step="0.05"></input>
+        sz: <input id="sz" type="range" name="sz" min="0.05" max="2.0" value="1.0" step="0.05"></input>
+    </div>
+    <div>
+        
+        <button id="new_cube">New Cube</button>
+        <button id="new_sphere">New Sphere</button>
+        <button id="new_cylinder">New Cylinder</button>
+        <button id="new_torus">New Torus</button>
+        <button id="new_pyramid">New Pyramid</button>
+        <button id="reset_current">reset current</button>
+        <button id="reset_all">reset all</button>
+</div>
+</body>
+</html>
