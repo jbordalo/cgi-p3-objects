@@ -1,6 +1,8 @@
 /** @type {WebGLRenderingContext} */
 var gl;
 let program;
+let canvas;
+let aspect;
 
 var instances = [];
 
@@ -16,13 +18,24 @@ let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = OFF;
 let CULLING = OFF;
 
-window.onload = function init() {
-    var canvas = document.getElementById("gl-canvas");
-    gl = WebGLUtils.setupWebGL(canvas);
-    if (!gl) { alert("WebGL isn't available"); }
+function fit_canvas_to_window() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    // Configure WebGL
+    aspect = canvas.width / canvas.height;
     gl.viewport(0, 0, canvas.width, canvas.height);
+
+}
+window.onresize = function () {
+    fit_canvas_to_window();
+}
+
+window.onload = function init() {
+    canvas = document.getElementById("gl-canvas");
+    gl = WebGLUtils.setupWebGL(canvas);
+
+    fit_canvas_to_window();
+
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
@@ -90,7 +103,6 @@ window.onload = function init() {
     document.getElementById("sx").oninput = update_ctm;
     document.getElementById("sy").oninput = update_ctm;
     document.getElementById("sz").oninput = update_ctm;
-
 
     render();
 }
