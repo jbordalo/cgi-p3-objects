@@ -32,7 +32,7 @@ window.onload = function init() {
     fit_canvas_to_window();
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    gl.enable(gl.DEPTH_TEST);
+
 
     // Load shaders and initialize attribute buffers
     program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -107,9 +107,13 @@ window.onload = function init() {
                 break;
             case "Z":
                 console.log("Z");
+                zBuffer();
+                Z_BUFFER ? console.log("Z-Buffer on") : console.log("Z-Buffer off");
                 break;
             case "B":
                 console.log("B");
+                cullFace();
+                CULLING ? console.log("Culling on") : console.log("Culling off");
                 break;
             default:
                 console.error("Unrecognized key");
@@ -140,6 +144,20 @@ function drawPrimitive(shape) {
         default:
             break;
     }
+}
+
+function zBuffer() {
+    if (Z_BUFFER)
+        gl.enable(gl.DEPTH_TEST);
+    else gl.disable(gl.DEPTH_TEST);
+    Z_BUFFER = !Z_BUFFER;
+}
+
+function cullFace() {
+    if (CULLING)
+        gl.enable(gl.CULL_FACE);
+    else gl.disable(gl.CULL_FACE);
+    CULLING = !CULLING;
 }
 
 function updateProj() {
