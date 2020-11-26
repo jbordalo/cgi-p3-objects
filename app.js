@@ -53,7 +53,6 @@ window.onload = function init() {
     sphereInit(gl);
     cylinderInit(gl);
     torusInit(gl);
-    pyramidInit(gl);
     paraboloidInit(gl);
 
     document.getElementById("new_cube").onclick = function () {
@@ -73,11 +72,6 @@ window.onload = function init() {
 
     document.getElementById("new_torus").onclick = function () {
         instances.push({ t: mat4(), p: torusDrawFilled });
-        reset_sliders();
-    };
-
-    document.getElementById("new_pyramid").onclick = function () {
-        instances.push({ t: mat4(), p: pyramidDrawWireFrame });
         reset_sliders();
     };
 
@@ -103,6 +97,27 @@ window.onload = function init() {
     document.getElementById("sx").oninput = update_ctm;
     document.getElementById("sy").oninput = update_ctm;
     document.getElementById("sz").oninput = update_ctm;
+
+    document.addEventListener('keydown', e => {
+        const keyName = e.key;
+        switch (keyName.toUpperCase()) {
+            case "W":
+                console.log("W");
+                break;
+            case "F":
+                console.log("F");
+                break;
+            case "Z":
+                console.log("Z");
+                break;
+            case "B":
+                console.log("B");
+                break;
+            default:
+                console.error("Unrecognized key");
+                break;
+        }
+    });
 
     render();
 }
