@@ -3,25 +3,27 @@
 
 <head>
     <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 vPosition;
-attribute vec4 vNormal;
-uniform mat4 mModel;
-uniform mat4 mView;
-uniform mat4 mProjection;
-varying vec4 fNormal;
-void main(){
-    gl_Position = mProjection * mView * mModel * vPosition;
-    fNormal = vNormal;
-}
-</script>
+        attribute vec4 vPosition;
+        attribute vec4 vNormal;
+        uniform mat4 mModel;
+        uniform mat4 mView;
+        uniform mat4 mProjection;
+        varying vec4 fNormal;
+
+        void main(){
+            gl_Position = mProjection * mView * mModel * vPosition;
+            fNormal = vNormal;
+        }
+    </script>
     <script id="fragment-shader" type="x-shader/x-fragment">
-precision mediump float;
-varying vec4 fNormal;
-void main() {
-    //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-    gl_FragColor = abs(fNormal);
-}
-</script>
+        precision mediump float;
+        varying vec4 fNormal;
+        void main() {
+            //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            gl_FragColor = abs(fNormal);
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
     <script type="text/javascript" src="../Common/webgl-utils.js"></script>
     <script type="text/javascript" src="../Common/initShaders.js"></script>
     <script type="text/javascript" src="../Common/MV.js"></script>
@@ -31,47 +33,77 @@ void main() {
     <script type="text/javascript" src="../Common/torus.js"></script>
     <script type="text/javascript" src="../Common/pyramid.js"></script>
     <script type="text/javascript" src="../Common/paraboloid.js"></script>
+    <script type="text/javascript" src="constants.js"></script>
     <script type="text/javascript" src="app.js"></script>
+    
 </head>
 
 <body>
     <div>
-        <title>Primitive Instanciation</title>
+        <title>Objects</title>
         <canvas id="gl-canvas" width="800" height="800">
             Oops... your browser doesn't support the HTML5 canvas element"
         </canvas>
+        
+    </div>
 
-        <div>
-            <label>l: </label><input id="l-factor" type="range" step=".1" min="0" max="1"></input>
-            <br>
-            <label>α: </label><input id="alpha" type="range" step=".1" min="0" max="360"></input>
-        </div>
+    <button class="tablink" onclick="openPage('ortho-proj', this, 'blue')">Orthogonal</button>
+    <button class="tablink" onclick="openPage('axon-proj', this, 'purple')" id="defaultOpen">Axonometric</button>
+    <button class="tablink" onclick="openPage('persp-proj', this, 'cyan')">Perspective</button>
+    <button class="tablink" onclick="openPage('objects', this, 'pink')">Objects</button>
 
+    <div id="ortho-proj" class="tabcontent">
+        <h3>Orthogonal Projection</h3>
         <div>
-            tx: <input id="tx" type="range" name="tx" min="-1.0" max="1.0" step="0.05"></input>
-            ty: <input id="ty" type="range" name="ty" min="-1.0" max="1.0" step="0.05"></input>
-            tz: <input id="tz" type="range" name="tz" min="-1.0" max="1.0" step="0.05"></input>
+            <input type="radio" id="ortho-alcado-princ" name="ortho-proj" value="PERSP_ALC_PRINC">
+            <label>Alcado Principal</label></br>
+            <input type="radio" id="ortho-plant" name="ortho-proj" value="PERSP_PLANT">
+            <label>Plant</label></br>
+            <input type="radio" id="ortho-alcado-lat" name="ortho-proj" value="PERSP_ALC_LAT">
+            <label>Alcado Lateral</label>
         </div>
+    </div>
+
+    <div id="axon-proj" class="tabcontent">
+        <h3>Axonometric Projection</h3>
         <div>
-            rx: <input id="rx" type="range" name="rx" min="-180" max="180.0" step="1"></input>
-            ry: <input id="ry" type="range" name="ry" min="-180" max="180.0" step="1"></input>
-            rz: <input id="rz" type="range" name="rz" min="-180" max="180.0" step="1"></input>
+            γ: <input id="gamma" type="range" name="gamma" min="0" max="360" step="0.05" disabled></input>
+            θ: <input id="theta" type="range" name="theta" min="0" max="360" step="0.05" disabled></input>
+        </div></br>
+        <div>
+            <input type="radio" id="axon-iso" name="axon-proj" value="ISO">
+            <label>Isometry</label></br>
+            <input type="radio" id="axon-dim" name="axon-proj" value="DIM">
+            <label>Dimetry</label></br>
+            <input type="radio" id="axon-tri" name="axon-proj" value="TRI">
+            <label>Trimetry</label></br>
+            <input type="radio" id="axon-free" name="axon-proj" value="FREE">
+            <label>Free</label>
         </div>
+    </div>
+
+    <div id="persp-proj" class="tabcontent">
+        <h3>Perspective Projection</h3>
+        <label></label>
+    </div>
+
+    <div id="objects" class="tabcontent">
+        <h3>Objects</h3>
         <div>
-            sx: <input id="sx" type="range" name="sx" min="0.05" max="2.0" value="1.0" step="0.05"></input>
-            sy: <input id="sy" type="range" name="sy" min="0.05" max="2.0" value="1.0" step="0.05"></input>
-            sz: <input id="sz" type="range" name="sz" min="0.05" max="2.0" value="1.0" step="0.05"></input>
-        </div>
-        <div>
-            <button id="new_cube">New Cube</button>
-            <button id="new_sphere">New Sphere</button>
-            <button id="new_cylinder">New Cylinder</button>
-            <button id="new_torus">New Torus</button>
+            <input type="radio" id="new_cube" name="objects" value="CUBE">
+            <label>Cube</label></br>
+            <input type="radio" id="new_sphere" name="objects" value="SPHERE">
+            <label>Sphere</label></br>
+            <input type="radio" id="new_cylinder" name="objects" value="CYLINDER">
+            <label>Cylinder</label></br>
+            <input type="radio" id="new_torus" name="objects" value="TORUS">
+            <label>Torus</label></br>
+
             <button id="reset_current">reset current</button>
             <button id="reset_all">reset all</button>
         </div>
-
     </div>
 </body>
+<script type="text/javascript" src="gui.js"></script>
 
 </html>

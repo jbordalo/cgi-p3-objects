@@ -4,19 +4,14 @@ let program;
 let canvas;
 let aspect;
 
-var instances = [];
-
 var mModelLoc;
 var mView, mProjection;
 
-let OFF = 0;
-let ON = 1;
-let WIREFRAME = 0;
-let FILLED = 1;
+let currentObject;
 
 let DRAWING_MODE = WIREFRAME;
-let Z_BUFFER = OFF;
-let CULLING = OFF;
+let Z_BUFFER = false;
+let CULLING = false;
 
 function fit_canvas_to_window() {
     canvas.width = window.innerWidth;
@@ -55,57 +50,60 @@ window.onload = function init() {
     torusInit(gl);
     paraboloidInit(gl);
 
-    document.getElementById("new_cube").onclick = function () {
-        instances.push({ t: mat4(), p: cubeDrawWireFrame });
-        reset_sliders();
+    document.getElementById("new_cube").onclick = () => { currentObject = CUBE };
+    document.getElementById("new_sphere").onclick = () => { currentObject = SPHERE };
+    document.getElementById("new_cylinder").onclick = () => { currentObject = CYLINDER };
+    document.getElementById("new_torus").onclick = () => { currentObject = TORUS };
+
+    // Perspective Projection
+
+    document.getElementById("ortho-alcado-princ").onclick = () => { };
+    document.getElementById("ortho-plant").onclick = () => { };
+    document.getElementById("ortho-alcado-lat").onclick = () => { };
+
+    // Axonometric Projection
+
+    document.getElementById("axon-iso").onclick = () => {
+        document.getElementById('gamma').disabled = true;
+        document.getElementById('theta').disabled = true;
+    };
+    document.getElementById("axon-dim").onclick = () => {
+        document.getElementById('gamma').disabled = true;
+        document.getElementById('theta').disabled = true;
+    };
+    document.getElementById("axon-tri").onclick = () => {
+        document.getElementById('gamma').disabled = true;
+        document.getElementById('theta').disabled = true;
+    };
+    document.getElementById("axon-free").onclick = () => {
+        document.getElementById('gamma').disabled = false;
+        document.getElementById('theta').disabled = false;
     };
 
-    document.getElementById("new_sphere").onclick = function () {
-        instances.push({ t: mat4(), p: sphereDrawWireFrame });
-        reset_sliders();
-    };
-
-    document.getElementById("new_cylinder").onclick = function () {
-        instances.push({ t: mat4(), p: cylinderDrawWireFrame });
-        reset_sliders();
-    };
-
-    document.getElementById("new_torus").onclick = function () {
-        instances.push({ t: mat4(), p: torusDrawFilled });
-        reset_sliders();
-    };
+    // Perspective Projection
+    // TODO
 
     document.getElementById("reset_current").onclick = function () {
-        instances[instances.length - 1].t = mat4();
         reset_sliders();
     };
 
     document.getElementById("reset_all").onclick = function () {
-        instances = [];
         reset_sliders();
     };
 
-    document.getElementById("l-factor").oninput = updateProj;
-    document.getElementById("alpha").oninput = updateProj;
-
-    document.getElementById("tx").oninput = update_ctm;
-    document.getElementById("ty").oninput = update_ctm;
-    document.getElementById("tz").oninput = update_ctm;
-    document.getElementById("rx").oninput = update_ctm;
-    document.getElementById("ry").oninput = update_ctm;
-    document.getElementById("rz").oninput = update_ctm;
-    document.getElementById("sx").oninput = update_ctm;
-    document.getElementById("sy").oninput = update_ctm;
-    document.getElementById("sz").oninput = update_ctm;
+    document.getElementById("gamma").oninput = updateProj;
+    document.getElementById("theta").oninput = updateProj;
 
     document.addEventListener('keydown', e => {
         const keyName = e.key;
         switch (keyName.toUpperCase()) {
             case "W":
                 console.log("W");
+                DRAWING_MODE = WIREFRAME;
                 break;
             case "F":
                 console.log("F");
+                DRAWING_MODE = FILLED;
                 break;
             case "Z":
                 console.log("Z");
@@ -122,54 +120,48 @@ window.onload = function init() {
     render();
 }
 
+function drawPrimitive(shape) {
+    switch (shape) {
+        case CUBE:
+            cubeDraw(gl, program, DRAWING_MODE);
+            break;
+        case SPHERE:
+            sphereDraw(gl, program, DRAWING_MODE);
+            break;
+        case CYLINDER:
+            cylinderDraw(gl, program, DRAWING_MODE);
+            break;
+        case PARABOLOID:
+            paraboloidDraw(gl, program, DRAWING_MODE);
+            break;
+        case TORUS:
+            torusDraw(gl, program, DRAWING_MODE);
+            break;
+        default:
+            break;
+    }
+}
+
 function updateProj() {
-    let lFactor = parseFloat(document.getElementById("l-factor").value);
-    let alpha = radians(parseFloat(document.getElementById("alpha").value));
+    // let gamma = parseFloat(document.getElementById("gamma").value);
+    // let theta = radians(parseFloat(document.getElementById("theta").value));
 
     mProjection = mat4();
-    mProjection[0][2] = -lFactor * Math.cos(alpha);
-    mProjection[1][2] = -lFactor * Math.sin(alpha);
-    mProjection[2][2] = -1;
+    // mProjection[0][2] = -lFactor * Math.cos(alpha);
+    // mProjection[1][2] = -lFactor * Math.sin(alpha);
+    // mProjection[2][2] = -1;
 }
 
-
-function update_ctm() {
-    if (instances.length == 0) return;
-
-    let tx = parseFloat(document.getElementById('tx').value);
-    let ty = parseFloat(document.getElementById('ty').value);
-    let tz = parseFloat(document.getElementById('tz').value);
-    let rx = parseFloat(document.getElementById('rx').value);
-    let ry = parseFloat(document.getElementById('ry').value);
-    let rz = parseFloat(document.getElementById('rz').value);
-    let sx = parseFloat(document.getElementById('sx').value);
-    let sy = parseFloat(document.getElementById('sy').value);
-    let sz = parseFloat(document.getElementById('sz').value);
-
-    let m = mult(translate([tx, ty, tz]),
-        mult(rotateZ(rz),
-            mult(rotateY(ry),
-                mult(rotateX(rx),
-                    scalem([sx, sy, sz])))));
-    instances[instances.length - 1].t = m;
-}
 
 function reset_sliders() {
-    update_sliders([0, 0, 0], [0, 0, 0], [1, 1, 1], [0, 0]);
+    document.getElementById('gamma').disabled = true;
+    document.getElementById('theta').disabled = true;
+    update_sliders([0, 0]);
 }
 
-function update_sliders(t, r, s, p) {
-    document.getElementById("tx").value = t[0];
-    document.getElementById("ty").value = t[1];
-    document.getElementById("tz").value = t[2];
-    document.getElementById("rx").value = r[0];
-    document.getElementById("ry").value = r[1];
-    document.getElementById("rz").value = r[2];
-    document.getElementById("sx").value = s[0];
-    document.getElementById("sy").value = s[1];
-    document.getElementById("sz").value = s[2];
-    document.getElementById("l-factor").value = p[0];
-    document.getElementById("alpha").value = p[1];
+function update_sliders(p) {
+    document.getElementById("gamma").value = p[0];
+    document.getElementById("theta").value = p[1];
 }
 
 function render() {
@@ -180,13 +172,8 @@ function render() {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER);
 
-    // Draw stored primitives
-    for (const i of instances) {
-        let t = i.t;
-        let p = i.p;
+    gl.uniformMatrix4fv(mModelLoc, false, flatten(mat4()));
+    drawPrimitive(currentObject);
 
-        gl.uniformMatrix4fv(mModelLoc, false, flatten(t));
-        p(gl, program);
-    }
     window.requestAnimationFrame(render);
 }
