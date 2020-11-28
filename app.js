@@ -33,7 +33,6 @@ window.onload = function init() {
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-
     // Load shaders and initialize attribute buffers
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
@@ -54,6 +53,7 @@ window.onload = function init() {
     document.getElementById("new_sphere").onclick = () => { currentObject = SPHERE };
     document.getElementById("new_cylinder").onclick = () => { currentObject = CYLINDER };
     document.getElementById("new_torus").onclick = () => { currentObject = TORUS };
+    document.getElementById("new_paraboloid").onclick = () => { currentObject = PARABOLOID };
 
     // Perspective Projection
 
