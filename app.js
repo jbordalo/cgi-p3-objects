@@ -158,17 +158,17 @@ function drawPrimitive(shape) {
 }
 
 function zBuffer() {
+    Z_BUFFER = !Z_BUFFER;
     if (Z_BUFFER)
         gl.enable(gl.DEPTH_TEST);
     else gl.disable(gl.DEPTH_TEST);
-    Z_BUFFER = !Z_BUFFER;
 }
 
 function cullFace() {
+    CULLING = !CULLING;
     if (CULLING)
         gl.enable(gl.CULL_FACE);
     else gl.disable(gl.CULL_FACE);
-    CULLING = !CULLING;
 }
 
 function axonometric(gamma, theta) {
