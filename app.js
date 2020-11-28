@@ -7,7 +7,7 @@ let aspect;
 var mModelLoc;
 var mView, mProjection;
 
-let currentObject;
+let currentObject = CUBE;
 
 let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
