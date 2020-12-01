@@ -228,7 +228,6 @@ function update_sliders(p) {
 }
 
 function render() {
-    mView = mat4();
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
