@@ -178,7 +178,7 @@ function axonometric(gamma, theta) {
     mProjection = mult(mult(aux, rotate(radians(gamma), [1, 0, 0])), rotate(radians(theta), [0, 1, 0]));
 }
 
-function isometry() {
+function dimetry() {
     // A=42º, B=7º
     let A = radians(42);
     let B = radians(7);
@@ -193,18 +193,18 @@ function isometry() {
 
 
 function frontView() {
-    mProjection = ortho(-1,1,-1,1,-1,1);
-    mView = lookAt([0,0,1],[0,0,0],[0,1,0]);
+    mProjection = ortho(-1, 1, -1, 1, -1, 1);
+    mView = lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
 }
 
 function plant() {
-    mProjection = ortho(-1,1,-1,1,-1,1);
-    mView = lookAt([0,1,0],[0,0,0],[1,0,0]);
+    mProjection = ortho(-1, 1, -1, 1, -1, 1);
+    mView = lookAt([0, 1, 0], [0, 0, 0], [1, 0, 0]);
 }
 
 function sideView() {
-    mProjection = ortho(-1,1,-1,1,-1,1);
-    mView = lookAt([1,0,0],[0,0,0],[0,1,0]);
+    mProjection = ortho(-1, 1, -1, 1, -1, 1);
+    mView = lookAt([1, 0, 0], [0, 0, 0], [0, 1, 0]);
 }
 
 function updateProj() {
@@ -212,7 +212,7 @@ function updateProj() {
     // let theta = radians(parseFloat(document.getElementById("theta").value));
 
     mProjection = mat4();
-    mView= mat4();
+    mView = mat4();
 }
 
 
