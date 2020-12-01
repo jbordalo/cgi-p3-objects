@@ -58,7 +58,7 @@ window.onload = function init() {
     // Perspective Projection
 
     document.getElementById("ortho-alcado-princ").onclick = frontView;
-    document.getElementById("ortho-plant").onclick = sideView;
+    document.getElementById("ortho-plant").onclick = plant;
     document.getElementById("ortho-alcado-lat").onclick = sideView;
 
     // Axonometric Projection
@@ -193,23 +193,18 @@ function isometry() {
 
 
 function frontView() {
-    mProjection = mat4();
-    mProjection[2][2] = 0;
+    mProjection = ortho(-1,1,-1,1,-1,1);
+    mView = lookAt([0,0,1],[0,0,0],[0,1,0]);
 }
 
 function plant() {
-    mProjection = mat4();
-    // mProjection[1][1] = 0;
-    // mProjection[1][2] = -1;
-    mProjection[2][2] = 0;
-    mProjection = mult(mProjection, rotate(radians(90), [1, 0, 0]))
+    mProjection = ortho(-1,1,-1,1,-1,1);
+    mView = lookAt([0,1,0],[0,0,0],[1,0,0]);
 }
 
 function sideView() {
-    mProjection = mat4();
-    mProjection[0][0] = 0;
-    mProjection[0][2] = 1
-    mProjection[2][2] = 0;
+    mProjection = ortho(-1,1,-1,1,-1,1);
+    mView = lookAt([1,0,0],[0,0,0],[0,1,0]);
 }
 
 function updateProj() {
@@ -217,9 +212,7 @@ function updateProj() {
     // let theta = radians(parseFloat(document.getElementById("theta").value));
 
     mProjection = mat4();
-    // mProjection[0][2] = -lFactor * Math.cos(alpha);
-    // mProjection[1][2] = -lFactor * Math.sin(alpha);
-    // mProjection[2][2] = -1;
+    mView= mat4();
 }
 
 
