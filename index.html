@@ -41,7 +41,7 @@
 <body>
     <div>
         <title>Objects</title>
-        <canvas id="gl-canvas" width="800" height="800">
+        <canvas id="gl-canvas" width="800" height="500">
             Oops... your browser doesn't support the HTML5 canvas element"
         </canvas>
         
@@ -67,8 +67,8 @@
     <div id="axon-proj" class="tabcontent">
         <h3>Axonometric Projection</h3>
         <div>
-            γ: <input id="gamma" type="range" name="gamma" min="0" max="360" step="1" disabled></input>
-            θ: <input id="theta" type="range" name="theta" min="0" max="360" step="1" disabled></input>
+            γ: <input id="gamma" type="range" name="gamma" min="0" max="360" step="0.01" value="60" disabled></input>
+            θ: <input id="theta" type="range" name="theta" min="0" max="360" step="0.01" value="60" disabled></input>
         </div></br>
         <div>
             <input type="radio" id="axon-iso" name="proj" value="ISO">

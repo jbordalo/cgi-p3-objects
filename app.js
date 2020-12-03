@@ -8,14 +8,20 @@ var mModelLoc;
 var mView, mProjection;
 
 let currentObject = CUBE;
+let currentProjection = dimetry;
+
+let theta = 60;
+let gamma = 60;
 
 let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
 let CULLING = false;
 
+let mScale = 1;
+
 function fit_canvas_to_window() {
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight / 2;
 
     aspect = canvas.width / canvas.height;
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -41,7 +47,7 @@ window.onload = function init() {
     mviewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
 
-    updateProj();
+    currentProjection();
 
     cubeInit(gl);
     sphereInit(gl);
@@ -57,44 +63,51 @@ window.onload = function init() {
 
     // Perspective Projection
 
-    document.getElementById("ortho-alcado-princ").onclick = frontView;
-    document.getElementById("ortho-plant").onclick = plant;
-    document.getElementById("ortho-alcado-lat").onclick = sideView;
+    document.getElementById("ortho-alcado-princ").onclick = () => { currentProjection = frontView };
+    document.getElementById("ortho-plant").onclick = () => { currentProjection = plant };
+    document.getElementById("ortho-alcado-lat").onclick = () => { currentProjection = sideView };
 
     // Axonometric Projection
 
     document.getElementById("axon-iso").onclick = () => {
         document.getElementById('gamma').disabled = true;
         document.getElementById('theta').disabled = true;
-        isometry();
+        currentProjection = isometry;
     };
     document.getElementById("axon-dim").onclick = () => {
         document.getElementById('gamma').disabled = true;
         document.getElementById('theta').disabled = true;
-        dimetry();
+        currentProjection = dimetry;
     };
     document.getElementById("axon-tri").onclick = () => {
         document.getElementById('gamma').disabled = true;
         document.getElementById('theta').disabled = true;
-        trimetry();
+        currentProjection = trimetry;
     };
     document.getElementById("axon-free").onclick = () => {
         document.getElementById('gamma').disabled = false;
         document.getElementById('theta').disabled = false;
-        axonometric(parseFloat(document.getElementById('gamma').value, 10), parseFloat(document.getElementById('theta').value));
+        theta = parseFloat(document.getElementById('theta').value, 10)
+        gamma = parseFloat(document.getElementById('gamma').value, 10);
+        currentProjection = axonometric;
     };
 
     document.getElementById("gamma").oninput = () => {
         // let gamma = parseFloat(document.getElementById('gamma').value, 10);
-        axonometric(parseFloat(document.getElementById('gamma').value, 10), parseFloat(document.getElementById('theta').value))
+        theta = parseFloat(document.getElementById('theta').value, 10)
+        gamma = parseFloat(document.getElementById('gamma').value, 10);
+        currentProjection = axonometric;
     };
     document.getElementById("theta").oninput = () => {
-        // let theta = parseFloat(document.getElementById('theta').value, 10);
-        axonometric(parseFloat(document.getElementById('gamma').value, 10), parseFloat(document.getElementById('theta').value))
+        theta = parseFloat(document.getElementById('theta').value, 10)
+        gamma = parseFloat(document.getElementById('gamma').value, 10);
+        currentProjection = axonometric;
     };
 
     // Perspective Projection
-    // TODO
+    // document.getElementById("persp-d").oninput = () => {
+
+    // }
 
     document.getElementById("reset_current").onclick = function () {
         reset_sliders();
@@ -104,6 +117,10 @@ window.onload = function init() {
         reset_sliders();
     };
 
+    canvas.onwheel = e => {
+        console.log(e);
+        mScale += e.deltaY * 0.001;
+    }
 
     document.addEventListener('keydown', e => {
         const keyName = e.key;
@@ -171,48 +188,77 @@ function cullFace() {
     else gl.disable(gl.CULL_FACE);
 }
 
-function axonometric(gamma, theta) {
+function axonometric() {
     // Max = Map ⋅ Rx(γ) ⋅ Ry(θ)
-    aux = mat4();
-    aux[2][2] = 0;
-    mProjection = mult(mult(aux, rotate(radians(gamma), [1, 0, 0])), rotate(radians(theta), [0, 1, 0]));
+    aux = mult(mat4(), mult(rotateX(gamma), rotateY(theta)));
+
+    let eye = [aux[2][0], aux[2][1], aux[2][2]];
+
+    mView = lookAt(eye, [0, 0, 0], [0, 1, 0]);
+
+    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+}
+
+function isometry() {
+    let A = radians(30), B = radians(30);
+
+    computeTheta(A, B);
+    computeGamma(A, B);
+
+    axonometric();
 }
 
 function dimetry() {
     // A=42º, B=7º
-    let A = radians(42);
-    let B = radians(7);
-    let theta = Math.atan(Math.sqrt(Math.tan(A) / Math.tan(B))) - Math.PI / 2;
-    console.log(theta);
-    let gamma = Math.asin(Math.sqrt(Math.tan(A) * Math.tan(B)));
-    console.log(gamma)
-    aux = mat4();
-    aux[2][2] = 0;
-    mProjection = mult(mult(aux, rotate(gamma, [1, 0, 0])), rotate(theta, [0, 1, 0]));
+    let A = radians(42), B = radians(7);
+    computeTheta(A, B);
+    computeGamma(A, B);
+
+    axonometric();
 }
 
+function trimetry() {
+    // A=54º16', B=23º16'
+    let A = radians(54 + minutesToDegrees(16));
+    let B = radians(23 + minutesToDegrees(16));
+
+    computeTheta(A, B);
+    computeGamma(A, B);
+
+    axonometric();
+
+}
+
+function computeTheta(A, B) {
+    theta = Math.atan(Math.sqrt(Math.tan(A) / Math.tan(B))) - Math.PI / 2;
+    theta = 180 * theta / Math.PI;
+    return theta;
+}
+
+function computeGamma(A, B) {
+    gamma = Math.asin(Math.sqrt(Math.tan(A) * Math.tan(B)));
+    gamma = 180 * gamma / Math.PI;
+    return gamma;
+}
+
+function minutesToDegrees(minutes) {
+    // 1º = 60'
+    return minutes / 60;
+}
 
 function frontView() {
-    mProjection = ortho(-1, 1, -1, 1, -1, 1);
     mView = lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
+    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
 }
 
 function plant() {
-    mProjection = ortho(-1, 1, -1, 1, -1, 1);
     mView = lookAt([0, 1, 0], [0, 0, 0], [1, 0, 0]);
+    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
 }
 
 function sideView() {
-    mProjection = ortho(-1, 1, -1, 1, -1, 1);
     mView = lookAt([1, 0, 0], [0, 0, 0], [0, 1, 0]);
-}
-
-function updateProj() {
-    // let gamma = parseFloat(document.getElementById("gamma").value);
-    // let theta = radians(parseFloat(document.getElementById("theta").value));
-
-    mProjection = mat4();
-    mView = mat4();
+    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
 }
 
 
@@ -230,11 +276,12 @@ function update_sliders(p) {
 function render() {
 
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
+    currentProjection();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER);
 
-    gl.uniformMatrix4fv(mModelLoc, false, flatten(mProjection));
+    gl.uniformMatrix4fv(mModelLoc, false, flatten(mat4()));
     drawPrimitive(currentObject);
 
     window.requestAnimationFrame(render);
