@@ -97,10 +97,10 @@ window.onload = function init() {
     };
 
     // Perspective Projection
-    // document.getElementById("persp-d").oninput = () => {
-
-    // }
-
+    document.getElementById("persp").onclick = () => {
+        lock_sliders();
+        currentProjection = perspect;
+    }
 
     canvas.onwheel = e => {
         console.log(e);
@@ -251,6 +251,10 @@ function sideView() {
     mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
 }
 
+function perspect() {
+    mView = lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
+    mProjection = perspective(60 * mScale, aspect * mScale, 0.1, 20);
+}
 
 function lock_sliders() {
     //document.querySelectorAll('input[name="proj"]:checked')[0].id
