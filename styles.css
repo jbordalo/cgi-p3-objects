@@ -31,6 +31,19 @@ html {
   height: 100%;
 }
 
+.switches {
+  /* padding-left: 5px; */
+  padding: 5px 0px 0px 5px;
+  font-family: Arial;
+  font-size: 15px;
+}
+
+.led {
+  background-color: red;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
 #ortho-proj {
   background-color: rgb(4, 4, 136);
 }

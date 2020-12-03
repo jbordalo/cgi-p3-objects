@@ -161,16 +161,28 @@ function drawPrimitive(shape) {
 
 function zBuffer() {
     Z_BUFFER = !Z_BUFFER;
-    if (Z_BUFFER)
+    if (Z_BUFFER) {
         gl.enable(gl.DEPTH_TEST);
-    else gl.disable(gl.DEPTH_TEST);
+        document.getElementById("z-buffer-stats").innerHTML = "ON";
+        document.getElementById("z-buffer-stats").style.backgroundColor = "green";
+    } else {
+        gl.disable(gl.DEPTH_TEST);
+        document.getElementById("z-buffer-stats").innerHTML = "OFF";
+        document.getElementById("z-buffer-stats").style.backgroundColor = "red";
+    }
 }
 
 function cullFace() {
     CULLING = !CULLING;
-    if (CULLING)
+    if (CULLING) {
         gl.enable(gl.CULL_FACE);
-    else gl.disable(gl.CULL_FACE);
+        document.getElementById("culling-stats").innerHTML = "ON";
+        document.getElementById("culling-stats").style.backgroundColor = "green";
+    } else {
+        gl.disable(gl.CULL_FACE);
+        document.getElementById("culling-stats").innerHTML = "OFF";
+        document.getElementById("culling-stats").style.backgroundColor = "red";
+    }
 }
 
 function axonometric() {
