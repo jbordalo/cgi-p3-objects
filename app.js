@@ -63,44 +63,36 @@ window.onload = function init() {
 
     // Perspective Projection
 
-    document.getElementById("ortho-alcado-princ").onclick = () => { currentProjection = frontView };
-    document.getElementById("ortho-plant").onclick = () => { currentProjection = plant };
-    document.getElementById("ortho-alcado-lat").onclick = () => { currentProjection = sideView };
+    document.getElementById("ortho-alcado-princ").onclick = () => { lock_sliders(); currentProjection = frontView };
+    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjection = plant };
+    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjection = sideView };
 
     // Axonometric Projection
 
     document.getElementById("axon-iso").onclick = () => {
-        document.getElementById('gamma').disabled = true;
-        document.getElementById('theta').disabled = true;
+        lock_sliders();
         currentProjection = isometry;
     };
     document.getElementById("axon-dim").onclick = () => {
-        document.getElementById('gamma').disabled = true;
-        document.getElementById('theta').disabled = true;
+        lock_sliders();
         currentProjection = dimetry;
     };
     document.getElementById("axon-tri").onclick = () => {
-        document.getElementById('gamma').disabled = true;
-        document.getElementById('theta').disabled = true;
+        lock_sliders();
         currentProjection = trimetry;
     };
     document.getElementById("axon-free").onclick = () => {
         document.getElementById('gamma').disabled = false;
         document.getElementById('theta').disabled = false;
-        theta = parseFloat(document.getElementById('theta').value, 10)
-        gamma = parseFloat(document.getElementById('gamma').value, 10);
         currentProjection = axonometric;
     };
 
     document.getElementById("gamma").oninput = () => {
-        // let gamma = parseFloat(document.getElementById('gamma').value, 10);
-        theta = parseFloat(document.getElementById('theta').value, 10)
         gamma = parseFloat(document.getElementById('gamma').value, 10);
         currentProjection = axonometric;
     };
     document.getElementById("theta").oninput = () => {
-        theta = parseFloat(document.getElementById('theta').value, 10)
-        gamma = parseFloat(document.getElementById('gamma').value, 10);
+        theta = parseFloat(document.getElementById('theta').value, 10);
         currentProjection = axonometric;
     };
 
@@ -109,13 +101,6 @@ window.onload = function init() {
 
     // }
 
-    document.getElementById("reset_current").onclick = function () {
-        reset_sliders();
-    };
-
-    document.getElementById("reset_all").onclick = function () {
-        reset_sliders();
-    };
 
     canvas.onwheel = e => {
         console.log(e);
@@ -195,7 +180,6 @@ function axonometric() {
     let eye = [aux[2][0], aux[2][1], aux[2][2]];
 
     mView = lookAt(eye, [0, 0, 0], [0, 1, 0]);
-
     mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
 }
 
@@ -211,6 +195,7 @@ function isometry() {
 function dimetry() {
     // A=42º, B=7º
     let A = radians(42), B = radians(7);
+
     computeTheta(A, B);
     computeGamma(A, B);
 
@@ -226,18 +211,23 @@ function trimetry() {
     computeGamma(A, B);
 
     axonometric();
-
 }
 
 function computeTheta(A, B) {
     theta = Math.atan(Math.sqrt(Math.tan(A) / Math.tan(B))) - Math.PI / 2;
+    // Change theta to degrees
     theta = 180 * theta / Math.PI;
+    // Set the slider
+    document.getElementById("theta").value = theta;
     return theta;
 }
 
 function computeGamma(A, B) {
     gamma = Math.asin(Math.sqrt(Math.tan(A) * Math.tan(B)));
+    // Change gamma to degrees
     gamma = 180 * gamma / Math.PI;
+    // Set the slider
+    document.getElementById("gamma").value = gamma;
     return gamma;
 }
 
@@ -262,19 +252,13 @@ function sideView() {
 }
 
 
-function reset_sliders() {
+function lock_sliders() {
+    //document.querySelectorAll('input[name="proj"]:checked')[0].id
     document.getElementById('gamma').disabled = true;
     document.getElementById('theta').disabled = true;
-    update_sliders([0, 0]);
-}
-
-function update_sliders(p) {
-    document.getElementById("gamma").value = p[0];
-    document.getElementById("theta").value = p[1];
 }
 
 function render() {
-
     gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
     currentProjection();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
