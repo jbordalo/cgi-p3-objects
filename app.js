@@ -103,7 +103,6 @@ window.onload = function init() {
     }
 
     canvas.onwheel = e => {
-        console.log(e);
         mScale += e.deltaY * 0.001;
     }
 
