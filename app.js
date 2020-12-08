@@ -1,5 +1,5 @@
 /** @type {WebGLRenderingContext} */
-var gl;
+let gl;
 let program;
 let canvas;
 let aspect;
@@ -17,9 +17,11 @@ let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
 let CULLING = false;
 
+// TODO limit
 let mScale = 1;
 
 function fit_canvas_to_window() {
+    // TODO find better values
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight / 2;
 
@@ -184,6 +186,14 @@ function cullFace() {
     }
 }
 
+function getOrtho() {
+    if (aspect >= 1) {
+        mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+    } else {
+        mProjection = ortho(-mScale, mScale, -mScale / aspect, mScale / aspect, -10, 10);
+    }
+}
+
 function axonometric() {
     // Max = Map ⋅ Rx(γ) ⋅ Ry(θ)
     aux = mult(mat4(), mult(rotateX(gamma), rotateY(theta)));
@@ -191,7 +201,8 @@ function axonometric() {
     let eye = [aux[2][0], aux[2][1], aux[2][2]];
 
     mView = lookAt(eye, [0, 0, 0], [0, 1, 0]);
-    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+
+    getOrtho();
 }
 
 function isometry() {
@@ -249,17 +260,17 @@ function minutesToDegrees(minutes) {
 
 function frontView() {
     mView = lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
-    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+    getOrtho();
 }
 
 function plant() {
     mView = lookAt([0, 1, 0], [0, 0, 0], [1, 0, 0]);
-    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+    getOrtho();
 }
 
 function sideView() {
     mView = lookAt([1, 0, 0], [0, 0, 0], [0, 1, 0]);
-    mProjection = ortho(-mScale * aspect, mScale * aspect, -mScale, mScale, -10, 10);
+    getOrtho();
 }
 
 function perspect() {
