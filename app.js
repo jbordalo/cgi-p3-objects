@@ -19,6 +19,9 @@ let lightAmbient = [];
 let lightDiffuse = [];
 let lightSpecular = [];
 
+let lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
+    materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
+
 let currentObject = CUBE;
 let currentProjection = dimetry;
 
@@ -62,6 +65,15 @@ window.onload = function init() {
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
     mModelViewLoc = gl.getUniformLocation(program, "mModelView");
+
+    lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
+    shininessLoc = gl.getUniformLocation(program, "shininess");
+    materialAmbientLoc = gl.getUniformLocation(program, "materialAmb"); 
+    materialDiffuseLoc = gl.getUniformLocation(program, "materialDif"); 
+    materialSpecularLoc = gl.getUniformLocation(program, "materialSpe"); 
+    lightAmbientLoc = gl.getUniformLocation(program, "lightAmb"); 
+    lightDiffuseLoc = gl.getUniformLocation(program, "lightDif"); 
+    lightSpecularLoc = gl.getUniformLocation(program, "lightSpe");    
 
     currentProjection();
 
@@ -118,19 +130,42 @@ window.onload = function init() {
         currentProjection = perspect;
     }
 
-
     // Lighting
-    document.getElementById("light-x").onchange = () => { lightPosition = [parseFloat(document.getElementById("light-x").value, 10), lightPosition[1], lightPosition[2]] };
-    document.getElementById("light-y").onchange = () => { lightPosition = [lightPosition[0], parseFloat(document.getElementById("light-y").value, 10), lightPosition[2]] };
-    document.getElementById("light-z").onchange = () => { lightPosition = [lightPosition[0], lightPosition[1], parseFloat(document.getElementById("light-z").value, 10)] };
+    document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value };
 
-    document.getElementById("mat-amb-light-x").onchange = () => { lightPosition = [parseFloat(document.getElementById("light-x").value, 10), lightPosition[1], lightPosition[2]] };
-    document.getElementById("mat-amb-light-y").onchange = () => { lightPosition = [lightPosition[0], parseFloat(document.getElementById("light-y").value, 10), lightPosition[2]] };
-    document.getElementById("mat-amb-light-z").onchange = () => { lightPosition = [lightPosition[0], lightPosition[1], parseFloat(document.getElementById("light-z").value, 10)] };
+    document.getElementById("shininess").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("shininess").value, 10) };
+
+    document.getElementById("light-x").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("light-x").value, 10) };
+    document.getElementById("light-y").onchange = () => { lightPosition[1] = parseFloat(document.getElementById("light-y").value, 10) };
+    document.getElementById("light-z").onchange = () => { lightPosition[2] = parseFloat(document.getElementById("light-z").value, 10) };
+
+    document.getElementById("mat-amb-x").onchange = () => { materialAmbient[0] = parseFloat(document.getElementById("mat-amb-x").value, 10) };
+    document.getElementById("mat-amb-y").onchange = () => { materialAmbient[1] = parseFloat(document.getElementById("mat-amb-y").value, 10) };
+    document.getElementById("mat-amb-z").onchange = () => { materialAmbient[2] = parseFloat(document.getElementById("mat-amb-z").value, 10) };
+
+    document.getElementById("mat-dif-x").onchange = () => { materialDiffuse[0] = parseFloat(document.getElementById("mat-dif-x").value, 10) };
+    document.getElementById("mat-dif-y").onchange = () => { materialDiffuse[1] = parseFloat(document.getElementById("mat-dif-y").value, 10) };
+    document.getElementById("mat-dif-z").onchange = () => { materialDiffuse[2] = parseFloat(document.getElementById("mat-dif-z").value, 10) };
+
+    document.getElementById("mat-spec-x").onchange = () => { materialSpecular[0] = parseFloat(document.getElementById("mat-spec-x").value, 10) };
+    document.getElementById("mat-spec-y").onchange = () => { materialSpecular[1] = parseFloat(document.getElementById("mat-spec-y").value, 10) };
+    document.getElementById("mat-spec-z").onchange = () => { materialSpecular[2] = parseFloat(document.getElementById("mat-spec-z").value, 10) };
+
+    document.getElementById("light-amb-x").onchange = () => { lightAmbient[0] = parseFloat(document.getElementById("light-amb-x").value, 10) };
+    document.getElementById("light-amb-y").onchange = () => { lightAmbient[1] = parseFloat(document.getElementById("light-amb-y").value, 10) };
+    document.getElementById("light-amb-z").onchange = () => { lightAmbient[2] = parseFloat(document.getElementById("light-amb-z").value, 10) };
+
+    document.getElementById("light-dif-x").onchange = () => { lightDiffuse[0] = parseFloat(document.getElementById("light-dif-x").value, 10) };
+    document.getElementById("light-dif-y").onchange = () => { lightDiffuse[1] = parseFloat(document.getElementById("light-dif-y").value, 10) };
+    document.getElementById("light-dif-z").onchange = () => { lightDiffuse[2] = parseFloat(document.getElementById("light-dif-z").value, 10) };
+
+    document.getElementById("light-spec-x").onchange = () => { lightSpecular[0] = parseFloat(document.getElementById("light-spec-x").value, 10) };
+    document.getElementById("light-spec-y").onchange = () => { lightSpecular[1] = parseFloat(document.getElementById("light-spec-y").value, 10) };
+    document.getElementById("light-spec-z").onchange = () => { lightSpecular[2] = parseFloat(document.getElementById("light-spec-z").value, 10) };
 
     canvas.onwheel = e => {
         mScale += e.deltaY * 0.001;
-    }
+    };
 
     document.addEventListener('keydown', e => {
         const keyName = e.key;
