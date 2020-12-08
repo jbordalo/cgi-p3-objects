@@ -9,17 +9,18 @@ let mViewLoc, mProjectionLoc, mNormalsLoc, mViewNormalsLoc, mModelViewLoc;
 let mView, mProjection;
 
 // Light
+let lighting = 0;
 let lightMode = POINT;
-let lightPosition = [];
-let shininess = 6;
-let materialAmbient = [];
-let materialDiffuse = [];
-let materialSpecular = [];
-let lightAmbient = [];
-let lightDiffuse = [];
-let lightSpecular = [];
+let lightPosition = [0.0, 1.3, 1.8, 1.0];
+let shininess = 6.0;
+let materialAmbient = [1.0, 0.0, 0.0];
+let materialDiffuse = [1.0, 0.0, 0.0];
+let materialSpecular = [1.0, 1.0, 1.0];
+let lightAmbient = [0.2, 0.2, 0.2];
+let lightDiffuse = [0.7, 0.7, 0.7];
+let lightSpecular = [1.0, 1.0, 1.0];
 
-let lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
+let lightingLoc, lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
 let currentObject = CUBE;
@@ -66,7 +67,8 @@ window.onload = function init() {
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
     mModelViewLoc = gl.getUniformLocation(program, "mModelView");
 
-    lightModeLoc = gl.getUniformLocation(program, "lightPosition");
+    lightingLoc = gl.getUniformLocation(program, "lighting");
+    lightModeLoc = gl.getUniformLocation(program, "lightMode");
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
     shininessLoc = gl.getUniformLocation(program, "shininess");
     materialAmbientLoc = gl.getUniformLocation(program, "materialAmb"); 
@@ -132,6 +134,11 @@ window.onload = function init() {
     }
 
     // Lighting
+    document.getElementById("lightTab").onclick = () => {
+        lighting = 1;
+        openPage('lighting', document.getElementById("lightTab"), 'deepskyblue');
+    }
+
     document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value };
 
     document.getElementById("shininess").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("shininess").value, 10) };
@@ -345,6 +352,7 @@ function lock_sliders() {
 }
 
 function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER);
 
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
@@ -353,25 +361,22 @@ function render() {
     currentProjection();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER);
-
     // mModelView = mView since mModel is I4
-
-    // gl.uniform1i(lightModeLoc, lightMode);
-    // gl.uniform3fv(lightPositionLoc,lightPosition);
-    // gl.uniform1f(shininessLoc, shininess);
-    // gl.uniform3fv(materialAmbientLoc, materialAmbient);
-    // gl.uniform3fv(materialDiffuseLoc, materialDiffuse);
-    // gl.uniform3fv(materialSpecularLoc, materialSpecular);
-    // gl.uniform3fv(lightAmbientLoc, lightAmbient);
-    // gl.uniform3fv(lightDiffuseLoc, lightDiffuse);
-    // gl.uniform3fv(lightSpecularLoc, lightSpecular);  
+    gl.uniform1f(lightingLoc, lighting);
+    gl.uniform1f(lightModeLoc, lightMode);
+    gl.uniform4fv(lightPositionLoc, lightPosition);
+    gl.uniform1f(shininessLoc, shininess);
+    gl.uniform3fv(materialAmbientLoc, materialAmbient);
+    gl.uniform3fv(materialDiffuseLoc, materialDiffuse);
+    gl.uniform3fv(materialSpecularLoc, materialSpecular);
+    gl.uniform3fv(lightAmbientLoc, lightAmbient);
+    gl.uniform3fv(lightDiffuseLoc, lightDiffuse);
+    gl.uniform3fv(lightSpecularLoc, lightSpecular);  
 
     gl.uniformMatrix4fv(mModelViewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(normalMatrix(mView)));
     gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(normalMatrix(mView)));
 
     drawPrimitive(currentObject);
-
     window.requestAnimationFrame(render);
 }
