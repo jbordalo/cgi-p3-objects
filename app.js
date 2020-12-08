@@ -19,7 +19,7 @@ let lightAmbient = [];
 let lightDiffuse = [];
 let lightSpecular = [];
 
-let lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
+let lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
 let currentObject = CUBE;
@@ -66,6 +66,7 @@ window.onload = function init() {
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
     mModelViewLoc = gl.getUniformLocation(program, "mModelView");
 
+    lightModeLoc = gl.getUniformLocation(program, "lightPosition");
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
     shininessLoc = gl.getUniformLocation(program, "shininess");
     materialAmbientLoc = gl.getUniformLocation(program, "materialAmb"); 
@@ -356,8 +357,17 @@ function render() {
 
     // mModelView = mView since mModel is I4
 
-    gl.uniformMatrix4fv(mModelViewLoc, false, flatten(mView));
+    // gl.uniform1i(lightModeLoc, lightMode);
+    // gl.uniform3fv(lightPositionLoc,lightPosition);
+    // gl.uniform1f(shininessLoc, shininess);
+    // gl.uniform3fv(materialAmbientLoc, materialAmbient);
+    // gl.uniform3fv(materialDiffuseLoc, materialDiffuse);
+    // gl.uniform3fv(materialSpecularLoc, materialSpecular);
+    // gl.uniform3fv(lightAmbientLoc, lightAmbient);
+    // gl.uniform3fv(lightDiffuseLoc, lightDiffuse);
+    // gl.uniform3fv(lightSpecularLoc, lightSpecular);  
 
+    gl.uniformMatrix4fv(mModelViewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(normalMatrix(mView)));
     gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(normalMatrix(mView)));
 
