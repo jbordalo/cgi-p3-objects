@@ -4,8 +4,20 @@ let program;
 let canvas;
 let aspect;
 
-var mModelLoc;
-var mView, mProjection;
+// Positions
+let mViewLoc, mProjectionLoc, mNormalsLoc, mViewNormalsLoc, mModelViewLoc;
+let mView, mProjection;
+
+// Light
+let lightMode = POINT;
+let lightPosition = [];
+let shininess = 6;
+let materialAmbient = [];
+let materialDiffuse = [];
+let materialSpecular = [];
+let lightAmbient = [];
+let lightDiffuse = [];
+let lightSpecular = [];
 
 let currentObject = CUBE;
 let currentProjection = dimetry;
@@ -45,9 +57,11 @@ window.onload = function init() {
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    mModelLoc = gl.getUniformLocation(program, "mModel");
-    mviewLoc = gl.getUniformLocation(program, "mView");
+    mViewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
+    mNormalsLoc = gl.getUniformLocation(program, "mNormals");
+    mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
+    mModelViewLoc = gl.getUniformLocation(program, "mModelView");
 
     currentProjection();
 
@@ -103,6 +117,16 @@ window.onload = function init() {
         lock_sliders();
         currentProjection = perspect;
     }
+
+
+    // Lighting
+    document.getElementById("light-x").onchange = () => { lightPosition = [parseFloat(document.getElementById("light-x").value, 10), lightPosition[1], lightPosition[2]] };
+    document.getElementById("light-y").onchange = () => { lightPosition = [lightPosition[0], parseFloat(document.getElementById("light-y").value, 10), lightPosition[2]] };
+    document.getElementById("light-z").onchange = () => { lightPosition = [lightPosition[0], lightPosition[1], parseFloat(document.getElementById("light-z").value, 10)] };
+
+    document.getElementById("mat-amb-light-x").onchange = () => { lightPosition = [parseFloat(document.getElementById("light-x").value, 10), lightPosition[1], lightPosition[2]] };
+    document.getElementById("mat-amb-light-y").onchange = () => { lightPosition = [lightPosition[0], parseFloat(document.getElementById("light-y").value, 10), lightPosition[2]] };
+    document.getElementById("mat-amb-light-z").onchange = () => { lightPosition = [lightPosition[0], lightPosition[1], parseFloat(document.getElementById("light-z").value, 10)] };
 
     canvas.onwheel = e => {
         mScale += e.deltaY * 0.001;
@@ -285,13 +309,23 @@ function lock_sliders() {
 }
 
 function render() {
-    gl.uniformMatrix4fv(mviewLoc, false, flatten(mView));
+
+    mNormalsLoc = gl.getUniformLocation(program, "mNormals");
+    mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
+
+    gl.uniformMatrix4fv(mViewLoc, false, flatten(mView));
     currentProjection();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER);
 
-    gl.uniformMatrix4fv(mModelLoc, false, flatten(mat4()));
+    // mModelView = mView since mModel is I4
+
+    gl.uniformMatrix4fv(mModelViewLoc, false, flatten(mView));
+
+    gl.uniformMatrix4fv(mNormalsLoc, false, flatten(normalMatrix(mView)));
+    gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(normalMatrix(mView)));
+
     drawPrimitive(currentObject);
 
     window.requestAnimationFrame(render);

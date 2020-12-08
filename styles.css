@@ -16,7 +16,7 @@ html {
   cursor: pointer;
   padding: 14px 16px;
   font-size: 17px;
-  width: 25%;
+  width: 20%;
 }
 
 .tablink:hover {
@@ -47,12 +47,19 @@ html {
 #ortho-proj {
   background-color: rgb(4, 4, 136);
 }
+
 #axon-proj {
   background-color: rgb(84, 14, 112);
 }
+
 #persp-proj {
   background-color: rgb(5, 133, 133);
 }
+
+#lighting {
+  background-color: rgb(8, 221, 221);
+}
+
 #objects {
   background-color: rgb(170, 5, 170);
 }

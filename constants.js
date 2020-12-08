@@ -6,3 +6,6 @@ const TORUS = 4;
 
 const WIREFRAME = 0;
 const FILLED = 1;
+
+const POINT = 0;
+const DIRECTIONAL = 1;
