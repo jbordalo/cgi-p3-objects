@@ -9,7 +9,7 @@ let mViewLoc, mProjectionLoc, mNormalsLoc, mViewNormalsLoc, mModelViewLoc;
 let mView, mProjection;
 
 // Light
-let lighting = 0;
+let lighting = OFF;
 let lightMode = POINT;
 let lightPosition = [0.0, 1.3, 1.8, 1.0];
 let shininess = 6.0;
@@ -24,7 +24,8 @@ let lightingLoc, lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLo
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
 let currentObject = CUBE;
-let currentProjection = dimetry;
+let currentProjection = AXON;
+let currentProjectionValues = [frontView,dimetry,perspect];
 
 let theta = 60;
 let gamma = 60;
@@ -78,7 +79,7 @@ window.onload = function init() {
     lightDiffuseLoc = gl.getUniformLocation(program, "lightDif"); 
     lightSpecularLoc = gl.getUniformLocation(program, "lightSpe");    
 
-    currentProjection();
+    currentProjectionValues[currentProjection]();
 
     cubeInit(gl);
     sphereInit(gl);
@@ -86,56 +87,79 @@ window.onload = function init() {
     torusInit(gl);
     paraboloidInit(gl);
 
+    // Get the element with id="defaultOpen" and click on it
     document.getElementById("new_cube").onclick = () => { currentObject = CUBE };
     document.getElementById("new_sphere").onclick = () => { currentObject = SPHERE };
     document.getElementById("new_cylinder").onclick = () => { currentObject = CYLINDER };
     document.getElementById("new_torus").onclick = () => { currentObject = TORUS };
     document.getElementById("new_paraboloid").onclick = () => { currentObject = PARABOLOID };
 
-    // Perspective Projection
+    // Ortho Projection
+    document.getElementById("orthoTab").onclick = () => {
+        lighting = OFF;
+        currentProjection = ORTHO;
+        openPage('ortho-proj',  document.getElementById("orthoTab"), 'blue');
+    }
 
-    document.getElementById("ortho-alcado-princ").onclick = () => { lock_sliders(); currentProjection = frontView };
-    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjection = plant };
-    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjection = sideView };
+    document.getElementById("ortho-alcado-princ").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = frontView; currentProjection = ORTHO; };
+    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = plant; currentProjection = ORTHO;  };
+    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = sideView; currentProjection = ORTHO;  };
 
     // Axonometric Projection
+    document.getElementById("axonTab").onclick = () => {
+        lighting = OFF;
+        currentProjection = AXON;
+        openPage('axon-proj',  document.getElementById("axonTab"), 'purple');
+    }
+
+    document.getElementById("axonTab").click();
+
 
     document.getElementById("axon-iso").onclick = () => {
         lock_sliders();
-        currentProjection = isometry;
+        currentProjectionValues[AXON] = isometry;
+        currentProjection = AXON;
     };
     document.getElementById("axon-dim").onclick = () => {
         lock_sliders();
-        currentProjection = dimetry;
+        currentProjectionValues[AXON] = dimetry;
+        currentProjection = AXON;
+
     };
     document.getElementById("axon-tri").onclick = () => {
         lock_sliders();
-        currentProjection = trimetry;
+        currentProjectionValues[AXON] = trimetry;
+        currentProjection = AXON;
+
     };
     document.getElementById("axon-free").onclick = () => {
         document.getElementById('gamma').disabled = false;
         document.getElementById('theta').disabled = false;
-        currentProjection = axonometric;
+        currentProjectionValues[AXON] = axonometric;
+        currentProjection = AXON;
     };
 
     document.getElementById("gamma").oninput = () => {
         gamma = parseFloat(document.getElementById('gamma').value, 10);
-        currentProjection = axonometric;
+        //currentProjectionValues[AXON] = axonometric;
+        //currentProjection = AXON;
     };
     document.getElementById("theta").oninput = () => {
         theta = parseFloat(document.getElementById('theta').value, 10);
-        currentProjection = axonometric;
+        //currentProjectionValues[AXON] = axonometric;
+        //currentProjection = AXON;
     };
 
     // Perspective Projection
-    document.getElementById("persp").onclick = () => {
-        lock_sliders();
-        currentProjection = perspect;
+    document.getElementById("perspTab").onclick = () => {
+        lighting = OFF;
+        currentProjection = PERSP;
+        openPage('persp-proj',  document.getElementById("perspTab"), 'darkcyan')
     }
 
     // Lighting
     document.getElementById("lightTab").onclick = () => {
-        lighting = 1;
+        lighting = ON;
         openPage('lighting', document.getElementById("lightTab"), 'deepskyblue');
     }
 
@@ -358,7 +382,7 @@ function render() {
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
 
     gl.uniformMatrix4fv(mViewLoc, false, flatten(mView));
-    currentProjection();
+    currentProjectionValues[currentProjection]();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
     // mModelView = mView since mModel is I4

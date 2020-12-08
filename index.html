@@ -118,20 +118,20 @@
 
     </div>
 
-    <button class="tablink" id = "orthoTab" onclick="openPage('ortho-proj', this, 'blue')">Orthogonal</button>
-    <button class="tablink" id = "axonTab" onclick="openPage('axon-proj', this, 'purple')">Axonometric</button>
-    <button class="tablink" id = "perspTab" onclick="openPage('persp-proj', this, 'darkcyan')">Perspective</button>
+    <button class="tablink" id = "orthoTab">Orthogonal</button>
+    <button class="tablink" id = "axonTab">Axonometric</button>
+    <button class="tablink" id = "perspTab">Perspective</button>
     <button class="tablink" id = "lightTab">Lighting</button>
-    <button class="tablink" id = "objTab" onclick="openPage('objects', this, 'pink')">Objects</button>
+    <button class="tablink" id = "objTab" onclick="openPage('objects', this, 'pink'); lighting = 0;">Objects</button>
 
     <div id="ortho-proj" class="tabcontent">
         <h3>Orthogonal Projection</h3>
         <div>
-            <input type="radio" id="ortho-alcado-princ" name="proj" value="PERSP_ALC_PRINC">
+            <input type="radio" id="ortho-alcado-princ" name="ortho" checked value="PERSP_ALC_PRINC">
             <label>Alcado Principal</label></br>
-            <input type="radio" id="ortho-plant" name="proj" value="PERSP_PLANT">
+            <input type="radio" id="ortho-plant" name="ortho" value="PERSP_PLANT">
             <label>Plant</label></br>
-            <input type="radio" id="ortho-alcado-lat" name="proj" value="PERSP_ALC_LAT">
+            <input type="radio" id="ortho-alcado-lat" name="ortho" value="PERSP_ALC_LAT">
             <label>Alcado Lateral</label>
         </div>
     </div>
@@ -143,20 +143,19 @@
             θ: <input id="theta" type="range" name="theta" min="-180" max="180" step="0.01" disabled></input>
         </div></br>
         <div>
-            <input type="radio" id="axon-iso" name="proj" value="ISO">
+            <input type="radio" id="axon-iso" name="axon" value="ISO">
             <label>Isometry</label></br>
-            <input type="radio" id="axon-dim" name="proj" value="DIM" checked="checked">
+            <input type="radio" id="axon-dim" name="axon" checked value="DIM" checked="checked">
             <label>Dimetry (A=42º, B=7º)</label></br>
-            <input type="radio" id="axon-tri" name="proj" value="TRI">
+            <input type="radio" id="axon-tri" name="axon" value="TRI">
             <label>Trimetry (A=54º 16', B=23º16') </label></br>
-            <input type="radio" id="axon-free" name="proj" value="FREE">
+            <input type="radio" id="axon-free" name="axon" value="FREE">
             <label>Free</label>
         </div>
     </div>
 
     <div id="persp-proj" class="tabcontent">
         <h3>Perspective Projection</h3>
-        <input type="radio" id="persp" name="proj" value="PERSP">
         <label>Perspective (centered at (0,0,d))</label>
     </div>
 
