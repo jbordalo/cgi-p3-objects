@@ -285,8 +285,9 @@ function axonometric() {
     aux = mult(mat4(), mult(rotateX(gamma), rotateY(theta)));
 
     let eye = [aux[2][0], aux[2][1], aux[2][2]];
+    let up = [aux[1][0], aux[1][1], aux[1][2]];
 
-    mView = lookAt(eye, [0, 0, 0], [0, 1, 0]);
+    mView = lookAt(eye, [0, 0, 0], up);
 
     getOrtho();
 }
