@@ -7,7 +7,6 @@
 
         uniform vec4 lightPosition;
         uniform float lighting;
-        uniform float lightMode;
 
         attribute vec4 vPosition; // vertex position in modelling coordinates
         attribute vec4 vNormal; // vertex normal in modelling coordinates
@@ -23,7 +22,7 @@
         varying vec3 fViewer; // View vector in camera space
 
         void main(){
-            if(lighting == 1.0){
+            if(lighting == 1.0) {
                 // compute position in camera frame
                 vec3 posC = (mModelView * vPosition).xyz;
                 
@@ -32,7 +31,7 @@
 
                 // compute light vector in camera frame
                 if(lightPosition.w == 0.0)
-                    fLight = normalize((mViewNormals * lightPosition).xyz);
+                    fLight = normalize((mViewNormals*lightPosition).xyz);
                 else
                     fLight = normalize((mView*lightPosition).xyz - posC);
 
@@ -170,7 +169,7 @@
         </select>
         <label>Light Position</label>
         <br><br>
-        <input id="shininess" type="range" min="0.0" step="1.0" default="6.0">
+        <input id="shininess" type="range" min="1" step="0.01" default="6.0">
         <label>Shininess</label>
         <br>
         <input id="mat-amb-x" type="number" min="-1.0" max="1.0" step="0.1">

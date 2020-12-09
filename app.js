@@ -17,15 +17,15 @@ let materialAmbient = [1.0, 0.0, 0.0];
 let materialDiffuse = [1.0, 0.0, 0.0];
 let materialSpecular = [1.0, 1.0, 1.0];
 let lightAmbient = [0.2, 0.2, 0.2];
-let lightDiffuse = [0.7, 0.7, 0.7];
+let lightDiffuse = [0.2, 0.2, 0.2];
 let lightSpecular = [1.0, 1.0, 1.0];
 
-let lightingLoc, lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc, 
+let lightingLoc, lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc,
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
 let currentObject = CUBE;
 let currentProjection = AXON;
-let currentProjectionValues = [frontView,dimetry,perspect];
+let currentProjectionValues = [frontView, dimetry, perspect];
 
 let theta = 60;
 let gamma = 60;
@@ -69,15 +69,14 @@ window.onload = function init() {
     mModelViewLoc = gl.getUniformLocation(program, "mModelView");
 
     lightingLoc = gl.getUniformLocation(program, "lighting");
-    lightModeLoc = gl.getUniformLocation(program, "lightMode");
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
     shininessLoc = gl.getUniformLocation(program, "shininess");
-    materialAmbientLoc = gl.getUniformLocation(program, "materialAmb"); 
-    materialDiffuseLoc = gl.getUniformLocation(program, "materialDif"); 
-    materialSpecularLoc = gl.getUniformLocation(program, "materialSpe"); 
-    lightAmbientLoc = gl.getUniformLocation(program, "lightAmb"); 
-    lightDiffuseLoc = gl.getUniformLocation(program, "lightDif"); 
-    lightSpecularLoc = gl.getUniformLocation(program, "lightSpe");    
+    materialAmbientLoc = gl.getUniformLocation(program, "materialAmb");
+    materialDiffuseLoc = gl.getUniformLocation(program, "materialDif");
+    materialSpecularLoc = gl.getUniformLocation(program, "materialSpe");
+    lightAmbientLoc = gl.getUniformLocation(program, "lightAmb");
+    lightDiffuseLoc = gl.getUniformLocation(program, "lightDif");
+    lightSpecularLoc = gl.getUniformLocation(program, "lightSpe");
 
     currentProjectionValues[currentProjection]();
 
@@ -98,18 +97,18 @@ window.onload = function init() {
     document.getElementById("orthoTab").onclick = () => {
         lighting = OFF;
         currentProjection = ORTHO;
-        openPage('ortho-proj',  document.getElementById("orthoTab"), 'blue');
+        openPage('ortho-proj', document.getElementById("orthoTab"), 'blue');
     }
 
     document.getElementById("ortho-alcado-princ").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = frontView; currentProjection = ORTHO; };
-    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = plant; currentProjection = ORTHO;  };
-    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = sideView; currentProjection = ORTHO;  };
+    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = plant; currentProjection = ORTHO; };
+    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = sideView; currentProjection = ORTHO; };
 
     // Axonometric Projection
     document.getElementById("axonTab").onclick = () => {
         lighting = OFF;
         currentProjection = AXON;
-        openPage('axon-proj',  document.getElementById("axonTab"), 'purple');
+        openPage('axon-proj', document.getElementById("axonTab"), 'purple');
     }
 
     document.getElementById("axonTab").click();
@@ -141,20 +140,16 @@ window.onload = function init() {
 
     document.getElementById("gamma").oninput = () => {
         gamma = parseFloat(document.getElementById('gamma').value, 10);
-        //currentProjectionValues[AXON] = axonometric;
-        //currentProjection = AXON;
     };
     document.getElementById("theta").oninput = () => {
         theta = parseFloat(document.getElementById('theta').value, 10);
-        //currentProjectionValues[AXON] = axonometric;
-        //currentProjection = AXON;
     };
 
     // Perspective Projection
     document.getElementById("perspTab").onclick = () => {
         lighting = OFF;
         currentProjection = PERSP;
-        openPage('persp-proj',  document.getElementById("perspTab"), 'darkcyan')
+        openPage('persp-proj', document.getElementById("perspTab"), 'darkcyan')
     }
 
     // Lighting
@@ -163,9 +158,9 @@ window.onload = function init() {
         openPage('lighting', document.getElementById("lightTab"), 'deepskyblue');
     }
 
-    document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value };
+    document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value == "DIRECTIONAL" ? DIRECTIONAL : POINT };
 
-    document.getElementById("shininess").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("shininess").value, 10) };
+    document.getElementById("shininess").oninput = () => { lightPosition[0] = parseFloat(document.getElementById("shininess").value, 10) };
 
     document.getElementById("light-x").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("light-x").value, 10) };
     document.getElementById("light-y").onchange = () => { lightPosition[1] = parseFloat(document.getElementById("light-y").value, 10) };
@@ -387,7 +382,7 @@ function render() {
 
     // mModelView = mView since mModel is I4
     gl.uniform1f(lightingLoc, lighting);
-    gl.uniform1f(lightModeLoc, lightMode);
+    lightPosition[3] = lightMode == DIRECTIONAL ? 0.0 : 1.0;
     gl.uniform4fv(lightPositionLoc, lightPosition);
     gl.uniform1f(shininessLoc, shininess);
     gl.uniform3fv(materialAmbientLoc, materialAmbient);
@@ -395,7 +390,7 @@ function render() {
     gl.uniform3fv(materialSpecularLoc, materialSpecular);
     gl.uniform3fv(lightAmbientLoc, lightAmbient);
     gl.uniform3fv(lightDiffuseLoc, lightDiffuse);
-    gl.uniform3fv(lightSpecularLoc, lightSpecular);  
+    gl.uniform3fv(lightSpecularLoc, lightSpecular);
 
     gl.uniformMatrix4fv(mModelViewLoc, false, flatten(mView));
     gl.uniformMatrix4fv(mNormalsLoc, false, flatten(normalMatrix(mView)));
