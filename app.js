@@ -141,7 +141,7 @@ window.onload = function init() {
         lighting = OFF;
         texturing = OFF;
         currentProjection = ORTHO;
-        openPage('ortho-proj', document.getElementById("orthoTab"), 'blue');
+        openPage('ortho-proj', document.getElementById("orthoTab"), 'red');
     }
 
     document.getElementById("ortho-front-view").onclick = () => { currentProjectionValues[ORTHO] = frontView; currentProjection = ORTHO; };
@@ -153,7 +153,7 @@ window.onload = function init() {
         lighting = OFF;
         texturing = OFF;
         currentProjection = AXON;
-        openPage('axon-proj', document.getElementById("axonTab"), 'purple');
+        openPage('axon-proj', document.getElementById("axonTab"), 'darkorange');
     }
 
     document.getElementById("axonTab").click();
@@ -195,7 +195,7 @@ window.onload = function init() {
         lighting = OFF;
         texturing = OFF;
         currentProjection = PERSP;
-        openPage('persp-proj', document.getElementById("perspTab"), 'darkcyan');
+        openPage('persp-proj', document.getElementById("perspTab"), 'gold');
     }
 
     document.getElementById("persp-d").oninput = () => {
@@ -206,7 +206,7 @@ window.onload = function init() {
     document.getElementById("lightTab").onclick = () => {
         lighting = ON;
         texturing = OFF;
-        openPage('lighting', document.getElementById("lightTab"), 'deepskyblue');
+        openPage('lighting', document.getElementById("lightTab"), 'limegreen');
     }
 
     document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value == "DIRECTIONAL" ? DIRECTIONAL : POINT };
@@ -245,7 +245,7 @@ window.onload = function init() {
     document.getElementById("textureTab").onclick = () => {
         lighting = OFF;
         texturing = ON;
-        openPage('texture', document.getElementById("textureTab"), 'aqua');
+        openPage('texture', document.getElementById("textureTab"), 'blue');
     }
 
     document.getElementById("tex-cylinder").onclick = () => { currentMapping = CYLINDRICAL };

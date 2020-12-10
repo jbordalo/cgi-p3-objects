@@ -45,25 +45,25 @@ html {
 }
 
 #ortho-proj {
-  background-color: rgb(4, 4, 136);
+  background-color: rgb(136, 13, 4);
 }
 
 #axon-proj {
-  background-color: rgb(84, 14, 112);
+  background-color: rgb(182, 87, 10);
 }
 
 #persp-proj {
-  background-color: rgb(5, 133, 133);
+  background-color: rgb(180, 165, 28);
 }
 
 #lighting {
-  background-color: rgb(8, 221, 221);
+  background-color: rgb(12, 141, 34);
 }
 
 #texture {
-  background-color: rgb(206, 102, 102);
+  background-color: rgb(17, 26, 148);
 }
 
 #objects {
-  background-color: rgb(170, 5, 170);
+  background-color: rgb(93, 9, 114);
 }
