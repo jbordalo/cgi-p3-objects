@@ -8,6 +8,8 @@
         uniform vec4 lightPosition;
         uniform float lighting;
 
+        uniform float projection;
+
         attribute vec4 vPosition; // vertex position in modelling coordinates
         attribute vec4 vNormal; // vertex normal in modelling coordinates
         
@@ -36,8 +38,11 @@
                     fLight = normalize((mView*lightPosition).xyz - posC);
 
                 // Compute the view vector
-                // fViewer = -fPosition; // Perspective projection
-                fViewer = vec3(0,0,1); // Parallel projection only
+                if (projection == 1.0) {
+                    fViewer = -posC; // Perspective projection
+                } else {
+                    fViewer = vec3(0,0,1); // Parallel projection
+                }
             } else {
                 fNormal = vNormal.xyz;
             }
@@ -93,7 +98,7 @@
             }
         }
     </script>
-    
+
     <link rel="stylesheet" href="styles.css">
     <script type="text/javascript" src="../Common/webgl-utils.js"></script>
     <script type="text/javascript" src="../Common/initShaders.js"></script>
@@ -117,11 +122,11 @@
 
     </div>
 
-    <button class="tablink" id = "orthoTab">Orthogonal</button>
-    <button class="tablink" id = "axonTab">Axonometric</button>
-    <button class="tablink" id = "perspTab">Perspective</button>
-    <button class="tablink" id = "lightTab">Lighting</button>
-    <button class="tablink" id = "objTab" onclick="openPage('objects', this, 'pink'); lighting = 0;">Objects</button>
+    <button class="tablink" id="orthoTab">Orthogonal</button>
+    <button class="tablink" id="axonTab">Axonometric</button>
+    <button class="tablink" id="perspTab">Perspective</button>
+    <button class="tablink" id="lightTab">Lighting</button>
+    <button class="tablink" id="objTab" onclick="openPage('objects', this, 'pink'); lighting = 0;">Objects</button>
 
     <div id="ortho-proj" class="tabcontent">
         <h3>Orthogonal Projection</h3>
@@ -229,4 +234,5 @@
 </body>
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="gui.js"></script>
+
 </html>

@@ -20,7 +20,7 @@ let lightAmbient = [0.2, 0.2, 0.2];
 let lightDiffuse = [0.2, 0.2, 0.2];
 let lightSpecular = [1.0, 1.0, 1.0];
 
-let lightingLoc, lightModeLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc,
+let lightingLoc, lightModeLoc, projectionLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc,
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
 let currentObject = CUBE;
@@ -72,6 +72,7 @@ window.onload = function init() {
 
     lightingLoc = gl.getUniformLocation(program, "lighting");
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
+    projectionLoc = gl.getUniformLocation(program, "projection");
     shininessLoc = gl.getUniformLocation(program, "shininess");
     materialAmbientLoc = gl.getUniformLocation(program, "materialAmb");
     materialDiffuseLoc = gl.getUniformLocation(program, "materialDif");
@@ -393,6 +394,7 @@ function render() {
     gl.uniform1f(lightingLoc, lighting);
     lightPosition[3] = lightMode == DIRECTIONAL ? 0.0 : 1.0;
     gl.uniform4fv(lightPositionLoc, lightPosition);
+    gl.uniform1f(projectionLoc, currentProjection == PERSP ? 1.0 : 0.0);
     gl.uniform1f(shininessLoc, shininess);
     gl.uniform3fv(materialAmbientLoc, materialAmbient);
     gl.uniform3fv(materialDiffuseLoc, materialDiffuse);
