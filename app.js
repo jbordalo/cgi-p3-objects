@@ -103,9 +103,9 @@ window.onload = function init() {
         openPage('ortho-proj', document.getElementById("orthoTab"), 'blue');
     }
 
-    document.getElementById("ortho-alcado-princ").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = frontView; currentProjection = ORTHO; };
-    document.getElementById("ortho-plant").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = plant; currentProjection = ORTHO; };
-    document.getElementById("ortho-alcado-lat").onclick = () => { lock_sliders(); currentProjectionValues[ORTHO] = sideView; currentProjection = ORTHO; };
+    document.getElementById("ortho-front-view").onclick = () => { currentProjectionValues[ORTHO] = frontView; currentProjection = ORTHO; };
+    document.getElementById("ortho-top-view").onclick = () => { currentProjectionValues[ORTHO] = topView; currentProjection = ORTHO; };
+    document.getElementById("ortho-side-view").onclick = () => { currentProjectionValues[ORTHO] = sideView; currentProjection = ORTHO; };
 
     // Axonometric Projection
     document.getElementById("axonTab").onclick = () => {
@@ -357,7 +357,7 @@ function frontView() {
     getOrtho();
 }
 
-function plant() {
+function topView() {
     mView = lookAt([0, 1, 0], [0, 0, 0], [1, 0, 0]);
     getOrtho();
 }
