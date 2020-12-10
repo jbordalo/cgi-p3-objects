@@ -30,6 +30,8 @@ let currentProjectionValues = [frontView, dimetry, perspect];
 let theta = 60;
 let gamma = 60;
 
+let perspD = 1.5;
+
 let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
 let CULLING = false;
@@ -149,7 +151,11 @@ window.onload = function init() {
     document.getElementById("perspTab").onclick = () => {
         lighting = OFF;
         currentProjection = PERSP;
-        openPage('persp-proj', document.getElementById("perspTab"), 'darkcyan')
+        openPage('persp-proj', document.getElementById("perspTab"), 'darkcyan');
+    }
+
+    document.getElementById("persp-d").oninput = () => {
+        perspD = parseFloat(document.getElementById("persp-d").value, 10);
     }
 
     // Lighting
@@ -282,10 +288,10 @@ function getOrtho() {
 
 function axonometric() {
     // Max = Map ⋅ Rx(γ) ⋅ Ry(θ)
-    aux = mult(mat4(), mult(rotateX(gamma), rotateY(theta)));
+    rotationMatrix = mult(mat4(), mult(rotateX(gamma), rotateY(theta)));
 
-    let eye = [aux[2][0], aux[2][1], aux[2][2]];
-    let up = [aux[1][0], aux[1][1], aux[1][2]];
+    let eye = [rotationMatrix[2][0], rotationMatrix[2][1], rotationMatrix[2][2]];
+    let up = [rotationMatrix[1][0], rotationMatrix[1][1], rotationMatrix[1][2]];
 
     mView = lookAt(eye, [0, 0, 0], up);
 
@@ -361,8 +367,8 @@ function sideView() {
 }
 
 function perspect() {
-    mView = lookAt([0, 0, 1], [0, 0, 0], [0, 1, 0]);
-    mProjection = perspective(60 * mScale, aspect * mScale, 0.1, 20);
+    mView = lookAt([0, 0, perspD], [0, 0, 0], [0, 1, 0]);
+    mProjection = perspective(60 * mScale, aspect, 0.1, 20);
 }
 
 function lock_sliders() {
@@ -378,6 +384,8 @@ function render() {
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
 
     gl.uniformMatrix4fv(mViewLoc, false, flatten(mView));
+
+    // Update projection
     currentProjectionValues[currentProjection]();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
