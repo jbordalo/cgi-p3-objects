@@ -8,7 +8,7 @@ let aspect;
 let mViewLoc, mProjectionLoc, mNormalsLoc, mViewNormalsLoc, mModelViewLoc;
 let mView, mProjection;
 
-// Light
+// Lighting
 let lighting = OFF;
 let lightMode = POINT;
 let lightPosition = [0.0, 1.3, 1.8, 1.0];
@@ -23,7 +23,14 @@ let lightSpecular = [1.0, 1.0, 1.0];
 let lightingLoc, lightModeLoc, projectionLoc, lightPositionLoc, shininessLoc, materialAmbientLoc, materialDiffuseLoc,
     materialSpecularLoc, lightAmbientLoc, lightDiffuseLoc, lightSpecularLoc;
 
-let currentObject = CUBE;
+// Texture
+let texture;
+let texturing = ON;
+let currentMapping = CYLINDRICAL;
+
+let texturingLoc, currentMappingLoc;
+
+let currentObject = CYLINDER;
 let currentProjection = AXON;
 let currentProjectionValues = [frontView, dimetry, perspect];
 
@@ -32,7 +39,7 @@ let gamma = 60;
 
 let perspD = 1.5;
 
-let DRAWING_MODE = WIREFRAME;
+let DRAWING_MODE = FILLED;
 let Z_BUFFER = false;
 let CULLING = false;
 
@@ -46,10 +53,36 @@ function fit_canvas_to_window() {
 
     aspect = canvas.width / canvas.height;
     gl.viewport(0, 0, canvas.width, canvas.height);
-
 }
+
 window.onresize = function () {
     fit_canvas_to_window();
+}
+
+function setupTexture() {
+    // Create a texture.
+    texture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    // Fill the texture with a 1x1 blue pixel.
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+        new Uint8Array([0, 0, 255, 255]));
+    // Asynchronously load an image
+    var image = new Image();
+    image.src = "textures/image.jpg";
+    image.onload = function () {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        // setup of texture parameters
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+        gl.generateMipmap(gl.TEXTURE_2D);
+        gl.bindTexture(gl.TEXTURE_2D, null);
+    };
 }
 
 window.onload = function init() {
@@ -57,19 +90,22 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL(canvas);
 
     fit_canvas_to_window();
-
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    setupTexture();
 
     // Load shaders and initialize attribute buffers
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
+    // Matrices
     mViewLoc = gl.getUniformLocation(program, "mView");
     mProjectionLoc = gl.getUniformLocation(program, "mProjection");
     mNormalsLoc = gl.getUniformLocation(program, "mNormals");
     mViewNormalsLoc = gl.getUniformLocation(program, "mViewNormals");
     mModelViewLoc = gl.getUniformLocation(program, "mModelView");
 
+    // Light
     lightingLoc = gl.getUniformLocation(program, "lighting");
     lightPositionLoc = gl.getUniformLocation(program, "lightPosition");
     projectionLoc = gl.getUniformLocation(program, "projection");
@@ -80,6 +116,10 @@ window.onload = function init() {
     lightAmbientLoc = gl.getUniformLocation(program, "lightAmb");
     lightDiffuseLoc = gl.getUniformLocation(program, "lightDif");
     lightSpecularLoc = gl.getUniformLocation(program, "lightSpe");
+
+    // Texture
+    texturingLoc = gl.getUniformLocation(program, "texturing");
+    currentMappingLoc = gl.getUniformLocation(program, "mapping");
 
     currentProjectionValues[currentProjection]();
 
@@ -99,6 +139,7 @@ window.onload = function init() {
     // Ortho Projection
     document.getElementById("orthoTab").onclick = () => {
         lighting = OFF;
+        texturing = OFF;
         currentProjection = ORTHO;
         openPage('ortho-proj', document.getElementById("orthoTab"), 'blue');
     }
@@ -110,6 +151,7 @@ window.onload = function init() {
     // Axonometric Projection
     document.getElementById("axonTab").onclick = () => {
         lighting = OFF;
+        texturing = OFF;
         currentProjection = AXON;
         openPage('axon-proj', document.getElementById("axonTab"), 'purple');
     }
@@ -151,6 +193,7 @@ window.onload = function init() {
     // Perspective Projection
     document.getElementById("perspTab").onclick = () => {
         lighting = OFF;
+        texturing = OFF;
         currentProjection = PERSP;
         openPage('persp-proj', document.getElementById("perspTab"), 'darkcyan');
     }
@@ -162,6 +205,7 @@ window.onload = function init() {
     // Lighting
     document.getElementById("lightTab").onclick = () => {
         lighting = ON;
+        texturing = OFF;
         openPage('lighting', document.getElementById("lightTab"), 'deepskyblue');
     }
 
@@ -197,8 +241,19 @@ window.onload = function init() {
     document.getElementById("light-spec-y").onchange = () => { lightSpecular[1] = parseFloat(document.getElementById("light-spec-y").value, 10) };
     document.getElementById("light-spec-z").onchange = () => { lightSpecular[2] = parseFloat(document.getElementById("light-spec-z").value, 10) };
 
+    // Texture
+    document.getElementById("textureTab").onclick = () => {
+        lighting = OFF;
+        texturing = ON;
+        openPage('texture', document.getElementById("textureTab"), 'aqua');
+    }
+
+    document.getElementById("tex-cylinder").onclick = () => { currentMapping = CYLINDRICAL };
+    document.getElementById("tex-sphere").onclick = () => { currentMapping = SPHERICAL };
+    document.getElementById("tex-orthogonal").onclick = () => { currentMapping = ORTHOGONAL; };
+
     canvas.onwheel = e => {
-        mScale += e.deltaY * 0.001;
+        mScale += (mScale + e.deltaY * 0.001) > 0.05 ? e.deltaY * 0.001 : 0;
     };
 
     document.addEventListener('keydown', e => {
@@ -368,8 +423,9 @@ function sideView() {
 }
 
 function perspect() {
+    let fovy = 2 * Math.atan(mScale / perspD) * 180 / Math.PI;
     mView = lookAt([0, 0, perspD], [0, 0, 0], [0, 1, 0]);
-    mProjection = perspective(60 * mScale, aspect, 0.1, 20);
+    mProjection = perspective(fovy, aspect, 0.1, mScale * 20);
 }
 
 function lock_sliders() {
@@ -390,6 +446,13 @@ function render() {
     currentProjectionValues[currentProjection]();
     gl.uniformMatrix4fv(mProjectionLoc, false, flatten(mProjection));
 
+    // Texture
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+    gl.uniform1f(texturingLoc, texturing);
+    gl.uniform1f(currentMappingLoc, currentMapping);
+
     // mModelView = mView since mModel is I4
     gl.uniform1f(lightingLoc, lighting);
     lightPosition[3] = lightMode == DIRECTIONAL ? 0.0 : 1.0;
@@ -408,5 +471,6 @@ function render() {
     gl.uniformMatrix4fv(mViewNormalsLoc, false, flatten(normalMatrix(mView)));
 
     drawPrimitive(currentObject);
+
     window.requestAnimationFrame(render);
 }

@@ -30,7 +30,7 @@ function paraboloidBuild(nlat, nlon) {
     // Generate minimum point
     var minimum = vec3(0, 0, 0);
     paraboloid_points.push(minimum);
-    paraboloid_normals.push(vec3(0, 1, 0));
+    // paraboloid_normals.push(vec3(0, 1, 0));
 
     // Generate middle
     for (var i = 0, phi = Math.PI / 2 - d_phi; i < nlat; i++, phi -= d_phi) {
