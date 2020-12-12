@@ -43,11 +43,9 @@ let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
 let CULLING = false;
 
-// TODO limit
 let mScale = 1;
 
 function fit_canvas_to_window() {
-    // TODO find better values
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight / 2;
 
@@ -203,7 +201,7 @@ window.onload = function init() {
 
     document.getElementById('light-switch').onclick = () => {
         lighting = !lighting;
-        if(texturing == ON){
+        if (texturing == ON) {
             document.getElementById('texture-switch').click();
         }
     }
@@ -247,7 +245,7 @@ window.onload = function init() {
 
     document.getElementById('texture-switch').onclick = () => {
         texturing = !texturing;
-        if(lighting == ON){
+        if (lighting == ON) {
             document.getElementById('light-switch').click();
         }
     }
