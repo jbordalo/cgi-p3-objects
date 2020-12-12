@@ -207,7 +207,7 @@ window.onload = function init() {
 
     document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value == "DIRECTIONAL" ? DIRECTIONAL : POINT };
 
-    document.getElementById("shininess").oninput = () => { lightPosition[0] = parseFloat(document.getElementById("shininess").value, 10) };
+    document.getElementById("shininess").oninput = () => { shininess = parseFloat(document.getElementById("shininess").value, 10) };
 
     document.getElementById("light-x").onchange = () => { lightPosition[0] = parseFloat(document.getElementById("light-x").value, 10) };
     document.getElementById("light-y").onchange = () => { lightPosition[1] = parseFloat(document.getElementById("light-y").value, 10) };
