@@ -3,7 +3,7 @@
 
 <head>
     <script id="vertex-shader" type="x-shader/x-vertex">
-        precision mediump float;
+        precision highp float;
 
         const float PI = 3.14159265359;
 
@@ -33,10 +33,10 @@
         varying vec3 fLight; // Light vector in camera space
         varying vec3 fViewer; // View vector in camera space
 
-        vec2 getMapping(vec4 pos) {
+        vec2 getMapping(vec3 pos) {
                 if (mapping == CYLINDRICAL) {
                     // TODO One curved (u) and one orthogonal (v)? Maybe don't divide by r
-                    return vec2(atan(-pos.z, pos.x) / (2.0 * PI), pos.y/PI) + vec2(0.5, 0.5);
+                    return vec2(atan(-pos.z, pos.x) / (2.0 * PI), pos.y) + vec2(0.5, 0.5);
                 } else if (mapping == SPHERICAL) {
                     float r = length(pos);
                     // return vec2((atan(-pos.z, pos.x) / (2.0*PI)), asin(pos.y/r)/PI ) + vec2(0.5, 0.5); 
@@ -72,7 +72,7 @@
             // Compute vertex position in clip coordinates (as usual)
             gl_Position = mProjection * mModelView * vPosition;
             if (texturing == 1.0) {
-                fTexCoords = getMapping(vPosition);
+                fTexCoords = getMapping(vPosition.xyz);
             }
             
         }
@@ -80,7 +80,7 @@
     </script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
+        precision highp float;
         uniform float lighting;
         uniform float texturing;
 
