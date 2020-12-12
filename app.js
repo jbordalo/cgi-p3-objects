@@ -203,7 +203,9 @@ window.onload = function init() {
 
     document.getElementById('light-switch').onclick = () => {
         lighting = !lighting;
-        document.getElementById('texture-switch').click();
+        if(texturing == ON){
+            document.getElementById('texture-switch').click();
+        }
     }
 
     document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value == "DIRECTIONAL" ? DIRECTIONAL : POINT };
@@ -245,7 +247,9 @@ window.onload = function init() {
 
     document.getElementById('texture-switch').onclick = () => {
         texturing = !texturing;
-        document.getElementById('light-switch').click();
+        if(lighting == ON){
+            document.getElementById('light-switch').click();
+        }
     }
 
     document.getElementById("tex-cylinder").onclick = () => { currentMapping = CYLINDRICAL };
