@@ -25,12 +25,12 @@ let lightingLoc, lightModeLoc, projectionLoc, lightPositionLoc, shininessLoc, ma
 
 // Texture
 let texture;
-let texturing = ON;
-let currentMapping = CYLINDRICAL;
+let texturing = OFF;
+let currentMapping = ORTHOGONAL;
 
 let texturingLoc, currentMappingLoc;
 
-let currentObject = CYLINDER;
+let currentObject = CUBE;
 let currentProjection = AXON;
 let currentProjectionValues = [frontView, dimetry, perspect];
 
@@ -39,7 +39,7 @@ let gamma = 60;
 
 let perspD = 1.5;
 
-let DRAWING_MODE = FILLED;
+let DRAWING_MODE = WIREFRAME;
 let Z_BUFFER = false;
 let CULLING = false;
 
@@ -138,8 +138,6 @@ window.onload = function init() {
 
     // Ortho Projection
     document.getElementById("orthoTab").onclick = () => {
-        lighting = OFF;
-        texturing = OFF;
         currentProjection = ORTHO;
         openPage('ortho-proj', document.getElementById("orthoTab"), 'red');
     }
@@ -150,8 +148,6 @@ window.onload = function init() {
 
     // Axonometric Projection
     document.getElementById("axonTab").onclick = () => {
-        lighting = OFF;
-        texturing = OFF;
         currentProjection = AXON;
         openPage('axon-proj', document.getElementById("axonTab"), 'darkorange');
     }
@@ -192,8 +188,6 @@ window.onload = function init() {
 
     // Perspective Projection
     document.getElementById("perspTab").onclick = () => {
-        lighting = OFF;
-        texturing = OFF;
         currentProjection = PERSP;
         openPage('persp-proj', document.getElementById("perspTab"), 'gold');
     }
@@ -204,9 +198,11 @@ window.onload = function init() {
 
     // Lighting
     document.getElementById("lightTab").onclick = () => {
-        lighting = ON;
-        texturing = OFF;
         openPage('lighting', document.getElementById("lightTab"), 'limegreen');
+    }
+
+    document.getElementById('light-switch').onclick = () => {
+        lighting = !lighting;
     }
 
     document.getElementById("light-direction").onchange = () => { lightMode = document.getElementById("light-direction").value == "DIRECTIONAL" ? DIRECTIONAL : POINT };
@@ -243,9 +239,11 @@ window.onload = function init() {
 
     // Texture
     document.getElementById("textureTab").onclick = () => {
-        lighting = OFF;
-        texturing = ON;
         openPage('texture', document.getElementById("textureTab"), 'blue');
+    }
+
+    document.getElementById('texture-switch').onclick = () => {
+        texturing = !texturing;
     }
 
     document.getElementById("tex-cylinder").onclick = () => { currentMapping = CYLINDRICAL };
