@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        precision highp float;
+
+        const float PI = 3.14159265359;
+
+        const float CYLINDRICAL = 0.0;
+        const float SPHERICAL = 1.0;
+        const float ORTHOGONAL = 2.0;
+
+        uniform vec4 lightPosition;
+        uniform float lighting;
+        uniform float texturing;
+        uniform float mapping;
+
+        uniform float projection;
+
+        attribute vec4 vPosition; // vertex position in modelling coordinates
+        attribute vec4 vNormal; // vertex normal in modelling coordinates
+
+        varying vec2 fTexCoords;
+
+        uniform mat4 mModelView; // model transformation
+        uniform mat4 mNormals; // model-view transformation for normals
+        uniform mat4 mView; // view transformation (for points)
+        uniform mat4 mViewNormals; // view transformation (for vectors)
+        uniform mat4 mProjection; // projection matrix
+
+        varying vec3 fNormal; // normal vector in camera space
+        varying vec3 fLight; // Light vector in camera space
+        varying vec3 fViewer; // View vector in camera space
+
+        vec2 getMapping(vec3 pos) {
+                if (mapping == CYLINDRICAL) {
+                    return vec2(atan(-pos.z, pos.x) / (2.0 * PI), pos.y) + vec2(0.5, 0.5);
+                } else if (mapping == SPHERICAL) {
+                    float r = length(pos); 
+                    return vec2((atan(-pos.z, pos.x) / PI + 1.0) * 0.5, asin(pos.y/r)/PI+0.5);
+                } else {
+                    return pos.xy + vec2(0.5,0.5);
+                }
+        }
+
+        void main(){
+            if(lighting == 1.0) {
+                // compute position in camera frame
+                vec3 posC = (mModelView * vPosition).xyz;
+                
+                // compute normal in camera frame
+                fNormal = (mNormals * vNormal).xyz;
+
+                // compute light vector in camera frame
+                if(lightPosition.w == 0.0)
+                    fLight = normalize((mViewNormals*lightPosition).xyz);
+                else
+                    fLight = normalize((mView*lightPosition).xyz - posC);
+
+                // Compute the view vector
+                if (projection == 1.0) {
+                    fViewer = -posC; // Perspective projection
+                } else {
+                    fViewer = vec3(0,0,1); // Parallel projection
+                }
+            } else {
+                fNormal = vNormal.xyz;
+            }
+            // Compute vertex position in clip coordinates (as usual)
+            gl_Position = mProjection * mModelView * vPosition;
+            if (texturing == 1.0) {
+                fTexCoords = getMapping(vPosition.xyz);
+            }
+            
+        }
+
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision highp float;
+        uniform float lighting;
+        uniform float texturing;
+
+        // Textures
+        varying vec2 fTexCoords;
+        uniform sampler2D texture;
+
+        varying vec3 fPosition;
+        varying vec3 fNormal;
+
+        // Lighting
+        uniform vec3 materialAmb;
+        uniform vec3 materialDif;
+        uniform vec3 materialSpe;
+        uniform float shininess;
+
+        uniform vec3 lightAmb;
+        uniform vec3 lightDif;
+        uniform vec3 lightSpe;
+
+        varying vec3 fLight;
+        varying vec3 fViewer;
+
+        void main() {
+            if(lighting == 1.0) {
+                vec3 ambientColor = lightAmb * materialAmb;
+                vec3 diffuseColor = lightDif * materialDif;
+                vec3 specularColor = lightSpe * materialSpe;
+
+                vec3 L = normalize(fLight);
+                vec3 V = normalize(fViewer);
+                vec3 N = normalize(fNormal);
+                vec3 H = normalize(L+V);
+
+                float diffuseFactor = max( dot(L, N), 0.0);
+                vec3 diffuse = diffuseFactor * diffuseColor;
+
+                float specularFactor = pow( max( dot(N,H), 0.0), shininess );
+                vec3 specular = specularFactor * specularColor;
+
+                if ( dot(L,N) < 0.0 ) {
+                    specular = vec3(0.0, 0.0, 0.0);
+                }
+
+                gl_FragColor = vec4(ambientColor + diffuse + specular, 1.0);
+            } else if (texturing == 1.0) {
+                gl_FragColor = texture2D(texture, fTexCoords);
+            } else {
+                gl_FragColor = vec4(fNormal, 1.0);
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../Common/initShaders.js"></script>
+    <script type="text/javascript" src="../Common/MV.js"></script>
+    <script type="text/javascript" src="../Common/cube.js"></script>
+    <script type="text/javascript" src="../Common/sphere.js"></script>
+    <script type="text/javascript" src="../Common/cylinder.js"></script>
+    <script type="text/javascript" src="../Common/torus.js"></script>
+    <script type="text/javascript" src="../Common/pyramid.js"></script>
+    <script type="text/javascript" src="../Common/paraboloid.js"></script>
+    <script type="text/javascript" src="constants.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="gui.js"></script>
+
+</head>
+
+<body>
+    <div>
+        <title>Objects</title>
+        <canvas id="gl-canvas" width="800" height="500">
+            Oops... your browser doesn't support the HTML5 canvas element"
+        </canvas>
+
+        <div class="switches">
+            <label>Z-Buffer: </label> <label id="z-buffer-stats" class="led">OFF</label></br>
+            <label>Culling: </label> <label id="culling-stats" class="led">OFF</label>
+        </div>
+
+    </div>
+
+    <button class="tablink" id="orthoTab">Orthogonal</button>
+    <button class="tablink" id="axonTab">Axonometric</button>
+    <button class="tablink" id="perspTab">Perspective</button>
+    <button class="tablink" id="lightTab">Lighting</button>
+    <button class="tablink" id="textureTab">Texture</button>
+    <button class="tablink" id="objTab" onclick="openPage('objects', this, 'purple');">Objects</button>
+
+    <div id="ortho-proj" class="tabcontent">
+        <h3>Orthogonal Projection</h3>
+        <div>
+            <input type="radio" id="ortho-front-view" name="ortho" checked>
+            <label>Front View</label></br>
+            <input type="radio" id="ortho-top-view" name="ortho">
+            <label>Top View</label></br>
+            <input type="radio" id="ortho-side-view" name="ortho">
+            <label>Side View</label>
+        </div>
+    </div>
+
+    <div id="axon-proj" class="tabcontent">
+        <h3>Axonometric Projection</h3>
+        <div>
+            γ: <input id="gamma" type="range" name="gamma" min="-180" max="180" step="0.01" disabled></input>
+            θ: <input id="theta" type="range" name="theta" min="-180" max="180" step="0.01" disabled></input>
+        </div></br>
+        <div>
+            <input type="radio" id="axon-iso" name="axon" value="ISO">
+            <label>Isometry</label></br>
+            <input type="radio" id="axon-dim" name="axon" checked value="DIM" checked="checked">
+            <label>Dimetry (A=42º, B=7º)</label></br>
+            <input type="radio" id="axon-tri" name="axon" value="TRI">
+            <label>Trimetry (A=54º16', B=23º16') </label></br>
+            <input type="radio" id="axon-free" name="axon" value="FREE">
+            <label>Free</label>
+        </div>
+    </div>
+
+    <div id="persp-proj" class="tabcontent">
+        <h3>Perspective Projection</h3>
+        <input type="range" id="persp-d" min="0" max="20" value="1.5" step="0.1"></br>
+        <label>Perspective (centered at (0,0,d))</label>
+    </div>
+
+    <div id="lighting" class="tabcontent">
+        <h3>Lighting</h3>
+        <div>
+            <!-- Rounded switch -->
+            <label class="switch">
+            <input id="light-switch" type="checkbox">
+            <span class="slider round"></span>
+            </label>
+        </div>
+        </br>
+        <input id="light-x" type="number" min="-20.0" max="20.0" step="0.1" value="0.0">
+        <input id="light-y" type="number" min="-20.0" max="20.0" step="0.1" value="1.3">
+        <input id="light-z" type="number" min="-20.0" max="20.0" step="0.1" value="1.8">
+        <select id="light-direction">
+            <option value="POINT">Point</option>
+            <option value="DIRECTIONAL">Directional</option>
+        </select>
+        <label>Light Position</label>
+        <br><br>
+        <input id="shininess" type="range" min="1.0" max="20.0" step="0.01" value="6.0">
+        <label>Shininess</label>
+        <br>
+        <input id="mat-amb-x" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="mat-amb-y" type="number" min="-1.0" max="1.0" step="0.1" value="0.0">
+        <input id="mat-amb-z" type="number" min="-1.0" max="1.0" step="0.1" value="0.0">
+        <label>Material Ambient</label>
+        <br>
+        <input id="mat-dif-x" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="mat-dif-y" type="number" min="-1.0" max="1.0" step="0.1" value="0.0">
+        <input id="mat-dif-z" type="number" min="-1.0" max="1.0" step="0.1" value="0.0">
+        <label>Material Diffuse</label>
+        <br>
+        <input id="mat-spec-x" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="mat-spec-y" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="mat-spec-z" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <label>Material Specular</label>
+        <br>
+        <input id="light-amb-x" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <input id="light-amb-y" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <input id="light-amb-z" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <label>Light Ambient</label>
+        <br>
+        <input id="light-dif-x" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <input id="light-dif-y" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <input id="light-dif-z" type="number" min="-1.0" max="1.0" step="0.1" value="0.2">
+        <label>Light Diffuse</label>
+        <br>
+        <input id="light-spec-x" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="light-spec-y" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <input id="light-spec-z" type="number" min="-1.0" max="1.0" step="0.1" value="1.0">
+        <label>Light Specular</label>
+    </div>
+
+    <div id="texture" class="tabcontent">
+        <h3>Texture</h3>
+        <div>
+            <!-- Rounded switch -->
+            <label class="switch">
+            <input id="texture-switch" type="checkbox">
+            <span class="slider round"></span>
+            </label>
+        </div>
+        </br>
+        <input type="radio" id="tex-cylinder" name="texture">
+        <label>Cylindrical Mapping</label></br>
+        <input type="radio" id="tex-sphere" name="texture">
+        <label>Spherical Mapping</label></br>
+        <input type="radio" id="tex-orthogonal" name="texture" checked>
+        <label>Orthogonal Mapping</label></br>
+    </div>
+
+    <div id="objects" class="tabcontent">
+        <h3>Objects</h3>
+        <div>
+            <input type="radio" id="new_cube" name="objects" value="CUBE" checked="checked">
+            <label>Cube</label></br>
+            <input type="radio" id="new_sphere" name="objects" value="SPHERE">
+            <label>Sphere</label></br>
+            <input type="radio" id="new_cylinder" name="objects" value="CYLINDER">
+            <label>Cylinder</label></br>
+            <input type="radio" id="new_torus" name="objects" value="TORUS">
+            <label>Torus</label></br>
+            <input type="radio" id="new_paraboloid" name="objects" value="PARABOLOID">
+            <label>Paraboloid</label></br>
+        </div>
+    </div>
+    
+</body>
+
+
+</html>

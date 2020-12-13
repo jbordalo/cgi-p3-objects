@@ -8,7 +8,7 @@ var cylinder_normals_buffer;
 var cylinder_faces_buffer;
 var cylinder_edges_buffer;
 
-var CYLINDER_N = 20;
+var CYLINDER_N = 30;
 
 function cylinderAddEdge(a, b, c, d) {
 	cylinder_edges.push(a);
@@ -184,4 +184,9 @@ function cylinderUploadData(gl) {
     cylinder_edges_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cylinder_edges_buffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cylinder_edges), gl.STATIC_DRAW);
+}
+
+function cylinderDraw(gl, program, filled=false) {
+	if(filled) cylinderDrawFilled(gl, program);
+	else cylinderDrawWireFrame(gl, program);
 }
