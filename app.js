@@ -431,7 +431,6 @@ function perspect() {
 }
 
 function lock_sliders() {
-    //document.querySelectorAll('input[name="proj"]:checked')[0].id
     document.getElementById('gamma').disabled = true;
     document.getElementById('theta').disabled = true;
 }

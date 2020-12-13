@@ -35,11 +35,9 @@
 
         vec2 getMapping(vec3 pos) {
                 if (mapping == CYLINDRICAL) {
-                    // TODO One curved (u) and one orthogonal (v)? Maybe don't divide by r
                     return vec2(atan(-pos.z, pos.x) / (2.0 * PI), pos.y) + vec2(0.5, 0.5);
                 } else if (mapping == SPHERICAL) {
-                    float r = length(pos);
-                    // return vec2((atan(-pos.z, pos.x) / (2.0*PI)), asin(pos.y/r)/PI ) + vec2(0.5, 0.5); 
+                    float r = length(pos); 
                     return vec2((atan(-pos.z, pos.x) / PI + 1.0) * 0.5, asin(pos.y/r)/PI+0.5);
                 } else {
                     return pos.xy + vec2(0.5,0.5);
@@ -91,6 +89,7 @@
         varying vec3 fPosition;
         varying vec3 fNormal;
 
+        // Lighting
         uniform vec3 materialAmb;
         uniform vec3 materialDif;
         uniform vec3 materialSpe;
@@ -144,6 +143,8 @@
     <script type="text/javascript" src="Common/pyramid.js"></script>
     <script type="text/javascript" src="Common/paraboloid.js"></script>
     <script type="text/javascript" src="constants.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="gui.js"></script>
 
 </head>
 
@@ -292,7 +293,6 @@
         </footer>
     </div>
 </body>
-<script type="text/javascript" src="app.js"></script>
-<script type="text/javascript" src="gui.js"></script>
+
 
 </html>
