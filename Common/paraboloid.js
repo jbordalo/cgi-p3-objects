@@ -30,7 +30,7 @@ function paraboloidBuild(nlat, nlon) {
     // Generate minimum point
     var minimum = vec3(0, 0, 0);
     paraboloid_points.push(minimum);
-    paraboloid_normals.push(vec3(0, r, 0));
+    paraboloid_normals.push(vec3(0, -1, 0));
 
     // Generate middle
     for (var i = 0, phi = Math.PI / 2 - d_phi; i < nlat; i++, phi -= d_phi) {
@@ -58,6 +58,19 @@ function paraboloidBuild(nlat, nlon) {
     paraboloid_faces.push(1);
     paraboloid_faces.push(nlon);
 
+    // var minimum = vec3(0, -0.00001, 0);
+    // paraboloid_points.push(minimum);
+    // paraboloid_normals.push(vec3(0, 1, 0));
+
+    for (var i = 0; i < nlon - 1; i++) {
+        paraboloid_faces.push(i + 1);
+        paraboloid_faces.push(i + 2);
+        paraboloid_faces.push(0);
+    }
+    paraboloid_faces.push(nlon);
+    paraboloid_faces.push(1);
+    paraboloid_faces.push(0);
+
     // general middle faces
     var offset = 1;
 
@@ -81,6 +94,28 @@ function paraboloidBuild(nlat, nlon) {
         paraboloid_faces.push(p - nlon + 1);
         paraboloid_faces.push(p + 1);
     }
+
+    for (var i = 0; i < nlat - 1; i++) {
+        for (var j = 0; j < nlon - 1; j++) {
+            var p = offset + i * nlon + j;
+            paraboloid_faces.push(p);
+            paraboloid_faces.push(p + nlon + 1);
+            paraboloid_faces.push(p + nlon);
+
+            paraboloid_faces.push(p);
+            paraboloid_faces.push(p + 1);
+            paraboloid_faces.push(p + nlon + 1);
+        }
+        var p = offset + i * nlon + nlon - 1;
+        paraboloid_faces.push(p);
+        paraboloid_faces.push(p + 1);
+        paraboloid_faces.push(p + nlon);
+
+        paraboloid_faces.push(p);
+        paraboloid_faces.push(p - nlon + 1);
+        paraboloid_faces.push(p + 1);
+    }
+
 
     // Build the edges
     for (var i = 0; i < nlon; i++) {

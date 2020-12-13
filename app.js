@@ -30,7 +30,7 @@ let currentMapping = ORTHOGONAL;
 
 let texturingLoc, currentMappingLoc;
 
-let currentObject = CUBE;
+let currentObject = PARABOLOID;
 let currentProjection = AXON;
 let currentProjectionValues = [frontView, dimetry, perspect];
 
