@@ -88,7 +88,7 @@ window.onload = function init() {
     gl = WebGLUtils.setupWebGL(canvas);
 
     fit_canvas_to_window();
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.2, 0.2, 0.2, 1.0);
 
     setupTexture();
 

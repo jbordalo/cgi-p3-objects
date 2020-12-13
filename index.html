@@ -128,7 +128,7 @@
             } else if (texturing == 1.0) {
                 gl_FragColor = texture2D(texture, fTexCoords);
             } else {
-                gl_FragColor = abs(vec4(fNormal, 1.0));
+                gl_FragColor = vec4(fNormal, 1.0);
             }
         }
     </script>
@@ -187,7 +187,7 @@
             <input type="radio" id="axon-dim" name="axon" checked value="DIM" checked="checked">
             <label>Dimetry (A=42º, B=7º)</label></br>
             <input type="radio" id="axon-tri" name="axon" value="TRI">
-            <label>Trimetry (A=54º 16', B=23º16') </label></br>
+            <label>Trimetry (A=54º16', B=23º16') </label></br>
             <input type="radio" id="axon-free" name="axon" value="FREE">
             <label>Free</label>
         </div>
