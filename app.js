@@ -30,7 +30,7 @@ let currentMapping = ORTHOGONAL;
 
 let texturingLoc, currentMappingLoc;
 
-let currentObject = PARABOLOID;
+let currentObject = CUBE;
 let currentProjection = AXON;
 let currentProjectionValues = [frontView, dimetry, perspect];
 
@@ -431,7 +431,6 @@ function perspect() {
 }
 
 function lock_sliders() {
-    //document.querySelectorAll('input[name="proj"]:checked')[0].id
     document.getElementById('gamma').disabled = true;
     document.getElementById('theta').disabled = true;
 }

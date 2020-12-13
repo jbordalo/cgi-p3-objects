@@ -26,10 +26,12 @@ function paraboloidBuild(nlat, nlon) {
     var d_theta = 2 * Math.PI / nlon;
     var r = 0.5;
 
-    var thickness = 0.02;
+    // Adding second layer to allow normals on both sides for lighting
+    var thickness = 0.001;
 
     // Generate minimum point
-    var north = vec3(0, -r + thickness, 0);
+    // -r to translate paraboloid to center it at (0,0,0)
+    var north = vec3(0, thickness - r, 0);
     paraboloid_points.push(north);
     paraboloid_normals.push(vec3(0, 1, 0));
 
@@ -44,9 +46,12 @@ function paraboloidBuild(nlat, nlon) {
             v = r * Math.cos(phi) * Math.sin(theta);
             var pt = vec3(
                 u,
-                // u * u + v * v + (phi > 0 ? thickness : 0),
-                -Math.pow(Math.sin(phi), 2) * r + (phi > 0 ? thickness : 0),
+                u * u + v * v + (phi > 0 ? thickness : 0),
                 v);
+
+            // Make the paraboloid centered at (0,0,0)
+            pt[1] -= r;
+
             paraboloid_points.push(pt);
             var n = vec3(pt);
             if (phi > 0) {
@@ -57,7 +62,8 @@ function paraboloidBuild(nlat, nlon) {
         }
     }
 
-    var south = vec3(0, -r, 0);
+    // Make the paraboloid centered at (0,0,0)
+    var south = vec3(0, 0 - r, 0);
     paraboloid_points.push(south);
     paraboloid_normals.push(vec3(0, -1, 0));
 
