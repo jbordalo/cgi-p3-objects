@@ -22,33 +22,48 @@ function paraboloidInit(gl, nlat, nlon) {
 function paraboloidBuild(nlat, nlon) {
     // phi will be latitude
     // theta will be longitude
-    // var d_phi = Math.PI / (2*nlat + 1);
     var d_phi = Math.PI / (nlat + 1);
     var d_theta = 2 * Math.PI / nlon;
     var r = 0.5;
 
+    var thickness = 0.02;
+
     // Generate minimum point
-    var minimum = vec3(0, 0, 0);
-    paraboloid_points.push(minimum);
-    paraboloid_normals.push(vec3(0, -1, 0));
+    var north = vec3(0, -r + thickness, 0);
+    paraboloid_points.push(north);
+    paraboloid_normals.push(vec3(0, 1, 0));
+
+    let u, v;
 
     // Generate middle
     for (var i = 0, phi = Math.PI / 2 - d_phi; i < nlat; i++, phi -= d_phi) {
         for (var j = 0, theta = 0; j < nlon; j++, theta += d_theta) {
             // y ,                              // z               // x              
             // Generate vertices
-            var pt = vec3(r * Math.cos(phi) * Math.cos(theta),
-                Math.pow(r * Math.cos(phi) * Math.cos(theta), 2) + Math.pow(r * Math.cos(phi) * Math.sin(theta), 2),
-                r * Math.cos(phi) * Math.sin(theta));
+            u = r * Math.cos(phi) * Math.cos(theta);
+            v = r * Math.cos(phi) * Math.sin(theta);
+            var pt = vec3(
+                u,
+                // u * u + v * v + (phi > 0 ? thickness : 0),
+                -Math.pow(Math.sin(phi), 2) * r + (phi > 0 ? thickness : 0),
+                v);
             paraboloid_points.push(pt);
             var n = vec3(pt);
-            paraboloid_normals.push(normalize(n));
+            if (phi > 0) {
+                paraboloid_normals.push(normalize(scale(-1, n)));
+            } else {
+                paraboloid_normals.push(normalize(n));
+            }
         }
     }
 
+    var south = vec3(0, -r, 0);
+    paraboloid_points.push(south);
+    paraboloid_normals.push(vec3(0, -1, 0));
+
     // Generate the faces
 
-    // minimum point faces
+    // north point faces
     for (var i = 0; i < nlon - 1; i++) {
         paraboloid_faces.push(0);
         paraboloid_faces.push(i + 2);
@@ -57,19 +72,6 @@ function paraboloidBuild(nlat, nlon) {
     paraboloid_faces.push(0);
     paraboloid_faces.push(1);
     paraboloid_faces.push(nlon);
-
-    // var minimum = vec3(0, -0.00001, 0);
-    // paraboloid_points.push(minimum);
-    // paraboloid_normals.push(vec3(0, 1, 0));
-
-    for (var i = 0; i < nlon - 1; i++) {
-        paraboloid_faces.push(i + 1);
-        paraboloid_faces.push(i + 2);
-        paraboloid_faces.push(0);
-    }
-    paraboloid_faces.push(nlon);
-    paraboloid_faces.push(1);
-    paraboloid_faces.push(0);
 
     // general middle faces
     var offset = 1;
@@ -95,31 +97,20 @@ function paraboloidBuild(nlat, nlon) {
         paraboloid_faces.push(p + 1);
     }
 
-    for (var i = 0; i < nlat - 1; i++) {
-        for (var j = 0; j < nlon - 1; j++) {
-            var p = offset + i * nlon + j;
-            paraboloid_faces.push(p);
-            paraboloid_faces.push(p + nlon + 1);
-            paraboloid_faces.push(p + nlon);
-
-            paraboloid_faces.push(p);
-            paraboloid_faces.push(p + 1);
-            paraboloid_faces.push(p + nlon + 1);
-        }
-        var p = offset + i * nlon + nlon - 1;
-        paraboloid_faces.push(p);
-        paraboloid_faces.push(p + 1);
-        paraboloid_faces.push(p + nlon);
-
-        paraboloid_faces.push(p);
-        paraboloid_faces.push(p - nlon + 1);
-        paraboloid_faces.push(p + 1);
+    // south point faces
+    var offset = 1 + (nlat - 1) * nlon;
+    for (var j = 0; j < nlon - 1; j++) {
+        paraboloid_faces.push(offset + nlon);
+        paraboloid_faces.push(offset + j);
+        paraboloid_faces.push(offset + j + 1);
     }
-
+    paraboloid_faces.push(offset + nlon);
+    paraboloid_faces.push(offset + nlon - 1);
+    paraboloid_faces.push(offset);
 
     // Build the edges
     for (var i = 0; i < nlon; i++) {
-        paraboloid_edges.push(0);   // minimum
+        paraboloid_edges.push(0);   // North pole 
         paraboloid_edges.push(i + 1);
     }
 
@@ -134,6 +125,10 @@ function paraboloidBuild(nlat, nlon) {
             if (i != nlat - 1) {
                 paraboloid_edges.push(p);   // vertical line (same longitude)
                 paraboloid_edges.push(p + nlon);
+            }
+            else {
+                paraboloid_edges.push(p);
+                paraboloid_edges.push(paraboloid_points.length - 1);
             }
         }
     }
