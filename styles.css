@@ -1,7 +1,7 @@
 /* Set height of body and the document to 100% to enable "full page tabs" */
 body,
 html {
-  height: 50%;
+  height: 60%;
   min-height: 250px;
   margin: 0;
   font-family: Arial;
@@ -33,9 +33,12 @@ html {
 }
 
 .switches {
-  /* padding-left: 5px; */
+  position: absolute;
+  left: 5px;
+  top: 5px;
   padding: 5px 0px 0px 5px;
   font-family: Arial;
+  color: white;
   font-size: 15px;
 }
 
