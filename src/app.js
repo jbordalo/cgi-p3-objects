@@ -66,7 +66,7 @@ function setupTexture() {
         new Uint8Array([0, 0, 255, 255]));
     // Asynchronously load an image
     var image = new Image();
-    image.src = "textures/image.jpg";
+    image.src = "../textures/image.jpg";
     image.onload = function () {
         gl.bindTexture(gl.TEXTURE_2D, texture);
 
